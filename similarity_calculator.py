@@ -7,9 +7,12 @@ from keras.applications.vgg16 import preprocess_input
 from sklearn.cluster import AffinityPropagation
 from sklearn.metrics.pairwise import cosine_similarity
 
+from FeatureExtractors.color_distribution_extractor import ColorDistributionFeatureExtractor
+from FeatureExtractors.vgg16_extractor import VGG16FeatureExtractor
+
 class SimilarityCalculator():
 
-    def __init__(self, images_ids_paths, feature_extraction_method='vgg16', distance_metric='cosine', clustering_method='affinity_propagation') -> None:
+    def __init__(self, images_pixel_data, feature_extraction_method='vgg16', distance_metric='cosine', clustering_method='affinity_propagation') -> None:
 
         #TODO: Change this to a class 'FeatureExtractor' or interface because implementing more methods will make this class too big
         self.feature_extraction_method = feature_extraction_method # Could be 'color_distribution', 'vgg16', 'vgg19', 'resnet50'... Implement more methods
@@ -20,14 +23,17 @@ class SimilarityCalculator():
         #TODO: Change this to a class 'ClusteringCalculator' or interface because implementing more methods will make this class too big
         self.clustering_method = clustering_method # Could be 'affinity_propagation', 'kmeans', 'dbscan'... Implement more methods
 
-        #TODO: Think if this should be received here or in the run method
-        self.images_ids_paths = images_ids_paths # Dictionary with {id: path} pairs
+        self.images_pixel_data = images_pixel_data # Dictionary with {id: path} pairs
 
         self.image_features = None # Dictionary with {id: features} pairs
         self.image_clusters = None # List of lists with id's of similar images ordered by similarity
 
-    def set_feature_extraction_method(self, feature_extraction_method: str) -> None:
+    def set_feature_extraction_method(self, feature_extraction_method: str, parameters: dict=None) -> None:
         self.feature_extraction_method = feature_extraction_method
+        self.set_feature_extraction_parameters(parameters)
+
+    def set_feature_extraction_parameters(self, parameters: dict) -> None:
+        self.feature_extraction_parameters = parameters
 
     def set_distance_metric(self, distance_metric: str) -> None:
         self.distance_metric = distance_metric
@@ -42,7 +48,7 @@ class SimilarityCalculator():
         #TODO Make a file with the extracted features and check if it exists, if it does, load it and skip the feature extraction. (Check if the method is the same as selected)
 
         # Load images and extract features
-        self.image_features = self._load_images_and_extract_features(self.images_ids_paths)
+        self.image_features = self._extract_features(self.images_pixel_data)
 
         # Normalize features
         self.image_features = self._normalize_features(self.image_features)
@@ -57,25 +63,19 @@ class SimilarityCalculator():
 
         return self.image_clusters
     
-    #TODO If the feature extraction is independent from the image loading, extract the loading to outside of this class
-    #TODO Separate this method in two 'load_images' and 'extract_features'
-    #TODO Change return type to use numpy arrays
-    def _load_images_and_extract_features(self, images_ids_paths: dict[int, str]) -> dict[int, np.ndarray]:
+    def _extract_features(self, images_pixel_data: dict[int, np.array]) -> dict[int, np.ndarray]:
+   
+        match self.feature_extraction_method:
+            case 'vgg16':
+                feature_extractor = VGG16FeatureExtractor(self.feature_extraction_parameters)
+            case 'color_distribution':
+                feature_extractor = ColorDistributionFeatureExtractor(self.feature_extraction_parameters)
+            case _:
+                raise Exception(f"Feature extraction method '{self.feature_extraction_method}' not implemented")
 
         images_features = {}
-
-        if self.feature_extraction_method != 'vgg16':
-            raise Exception(f"Feature extraction method '{self.feature_extraction_method}' not implemented")
-        
-        #TODO extract this to a method or class
-        model = VGG16(weights='imagenet', include_top=False)
-        for (image_id, image_path) in images_ids_paths.items():
-            img = image.load_img(image_path, target_size=(224, 224))
-            img_data = image.img_to_array(img)
-            img_data = np.expand_dims(img_data, axis=0)
-            img_data = preprocess_input(img_data)
-            features = np.array(model.predict(img_data))
-            images_features[image_id] = features.flatten()
+        for (image_id, img) in images_pixel_data.items():
+            images_features[image_id] = feature_extractor.extract_features(img)
 
         return images_features
 
@@ -102,13 +102,6 @@ class SimilarityCalculator():
 
         #TODO: Give the option to use different parameters
         affprop = AffinityPropagation(affinity="precomputed", damping=0.5, max_iter=350 , preference= 0.5).fit(similarity_matrix)
-
-        print("IDS PATHS")
-        for (image_id, image_path) in self.images_ids_paths.items():
-            print(image_id, image_path)
-        print("LABELS")
-        print(affprop.labels_)
-        print(max(affprop.labels_) + 1)
 
         clusters = [[] for _ in range(max(affprop.labels_) + 1)]
 

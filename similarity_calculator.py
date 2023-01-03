@@ -9,10 +9,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from FeatureExtractors.color_distribution_extractor import ColorDistributionFeatureExtractor
 from FeatureExtractors.vgg16_extractor import VGG16FeatureExtractor
+from FeatureExtractors.mobilenet_extractor import MobileNetFeatureExtractor
 
 class SimilarityCalculator():
 
-    def __init__(self, images_pixel_data, feature_extraction_method='vgg16', distance_metric='cosine', clustering_method='affinity_propagation') -> None:
+    def __init__(self, images_pixel_data, images_cached_features:dict[int,np.array]={}, feature_extraction_method='vgg16', distance_metric='cosine', clustering_method='affinity_propagation') -> None:
 
         #TODO: Change this to a class 'FeatureExtractor' or interface because implementing more methods will make this class too big
         self.feature_extraction_method = feature_extraction_method # Could be 'color_distribution', 'vgg16', 'vgg19', 'resnet50'... Implement more methods
@@ -25,7 +26,8 @@ class SimilarityCalculator():
 
         self.images_pixel_data = images_pixel_data # Dictionary with {id: path} pairs
 
-        self.image_features = None # Dictionary with {id: features} pairs
+        self.image_features = images_cached_features # Dictionary with {id: features} pairs
+
         self.image_clusters = None # List of lists with id's of similar images ordered by similarity
 
     def set_feature_extraction_method(self, feature_extraction_method: str, parameters: dict=None) -> None:
@@ -41,17 +43,16 @@ class SimilarityCalculator():
     def set_clustering_method(self, clustering_method: str) -> None:
         self.clustering_method = clustering_method
 
+    def get_normalized_features(self) -> dict[int, np.ndarray]:
+        return self.image_features
+
     def run(self) -> list[list[int]]: # Each list inside contains a group of id's of similar images ordered by similarity
         
-        # Check if there are images to compare
-        # Check if features had already been extracted
-        #TODO Make a file with the extracted features and check if it exists, if it does, load it and skip the feature extraction. (Check if the method is the same as selected)
-
-        # Load images and extract features
-        self.image_features = self._extract_features(self.images_pixel_data)
+        # Extract features
+        extracted_features = self._extract_features(self.images_pixel_data)
 
         # Normalize features
-        self.image_features = self._normalize_features(self.image_features)
+        self.image_features.update(self._normalize_features(extracted_features))
 
         # Calculate similarity matrix
         similarity_matrix = self._calculate_similarity_matrix(self.image_features)
@@ -64,10 +65,16 @@ class SimilarityCalculator():
         return self.image_clusters
     
     def _extract_features(self, images_pixel_data: dict[int, np.array]) -> dict[int, np.ndarray]:
-   
+
+        if not images_pixel_data: return {} # If there are no images to extract features from, return an empty dictionary
+
+        print("Extracting features...")
+            
         match self.feature_extraction_method:
             case 'vgg16':
                 feature_extractor = VGG16FeatureExtractor(self.feature_extraction_parameters)
+            case 'mobilenet':
+                feature_extractor = MobileNetFeatureExtractor(self.feature_extraction_parameters)
             case 'color_distribution':
                 feature_extractor = ColorDistributionFeatureExtractor(self.feature_extraction_parameters)
             case _:
@@ -80,6 +87,8 @@ class SimilarityCalculator():
         return images_features
 
     def _normalize_features(self, images_features: dict[int, np.ndarray]) -> dict[int, np.ndarray]:
+
+        if not images_features: return {} # If there are no images to normalize features from, return an empty dictionary
 
         for (image_id, image_features) in images_features.items():
             images_features[image_id] = image_features / np.linalg.norm(image_features)

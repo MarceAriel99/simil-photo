@@ -16,8 +16,8 @@ def main(path):
     # Search for images in path
     images_names_paths = file_searcher.file_search(path, ('.jpg', '.png'))
 
-    for (image_name, image_root) in images_names_paths.items():
-        print(image_name, image_root)
+    #for (image_name, image_root) in images_names_paths.items():
+    #    print(image_name, image_root)
 
     # Create {id: absolute_path} dictionary
     images_ids_paths = {}
@@ -44,14 +44,14 @@ def main(path):
     
     # Create SimilarityCalculator object
     #similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method='color_distribution')
-    #similarity_calculator.set_feature_extraction_parameters({'color_bins':3})
+    #similarity_calculator.set_feature_extraction_parameters({'color_bins':16})
     similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method='vgg16')
     similarity_calculator.set_feature_extraction_parameters({'weights': 'imagenet', 'include_top': False})
 
     # Run similarity calculator
     image_clusters = similarity_calculator.run()
 
-    # Save precalculated features
+    # Save cached features
     images_paths_features:dict[str,np.array] = {}
     for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
         images_paths_features[images_ids_paths.get(image_id)] = image_features

@@ -47,12 +47,27 @@ class SimilarityCalculator():
         return self.image_features
 
     def run(self) -> list[list[int]]: # Each list inside contains a group of id's of similar images ordered by similarity
+
+        #print("CACHED FEATURES")
+        for (image_id, image_features) in self.image_features.items():
+            #print(f"Image {image_id} has {image_features} cached features")
+            pass
+
+        #print("NO CACHED FEATURES")
+        for (image_id, image_features) in self.images_pixel_data.items():
+            #print(f"Image {image_id} has no cached features")
+            pass
         
         # Extract features
         extracted_features = self._extract_features(self.images_pixel_data)
 
         # Normalize features
         self.image_features.update(self._normalize_features(extracted_features))
+
+        #print("UPDATED FEATURES")
+        for (image_id, image_features) in self.image_features.items():
+            #print(f"Image {image_id} has {image_features} features")
+            pass
 
         # Calculate similarity matrix
         similarity_matrix = self._calculate_similarity_matrix(self.image_features)
@@ -70,7 +85,7 @@ class SimilarityCalculator():
 
         print("Extracting features...")
             
-        match self.feature_extraction_method:
+        match self.feature_extraction_method: # TODO BUG, I think I have to use a seed to replicate results with CNNs 
             case 'vgg16':
                 feature_extractor = VGG16FeatureExtractor(self.feature_extraction_parameters)
             case 'mobilenet':
@@ -100,9 +115,13 @@ class SimilarityCalculator():
         if self.distance_metric != 'cosine':
             raise Exception(f"Distance metric '{self.distance_metric}' not implemented")
 
-        features_array = np.array(list(images_features.values()))
+        # The array has to be ordered by id, because the cluster uses the index of the array as the id of the image
+        features_array = [[] for _ in range(len(images_features))]
 
-        return cosine_similarity(features_array)
+        for id, features in images_features.items():
+            features_array[id] = features
+
+        return cosine_similarity(np.array(features_array))
 
     def _calculate_clusters(self, similarity_matrix: np.ndarray) -> list[list[int]]:
 

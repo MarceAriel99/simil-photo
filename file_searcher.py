@@ -5,7 +5,6 @@ Receives a string representing the root directory and a tuple of searched extens
 Returns a dictionary with key -> file_name, value -> file_directory
 '''
 
-# TODO: Manage exceptions
 def file_search(root_directory:str, extensions:tuple[str], search_in_root_only:bool=False) -> dict[str, str]:
 
     result = {}

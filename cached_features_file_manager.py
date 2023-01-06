@@ -3,6 +3,7 @@ import os
 import numpy as np
 
 # TODO: Make 'TEMP.csv' a constant
+TEMP_FILE_NAME = 'TEMP.csv'
 
 def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int, np.array]:
 
@@ -31,7 +32,7 @@ def save_cached_features(images_paths_features:dict[str, np.array], file_path, f
     if force_overwrite: print("Force overwrite is enabled, this will overwrite all the cached features")
 
     try:
-        with open(file_path, 'r', newline='') as csvfile, open('TEMP.csv', 'w', newline='') as tempfile:
+        with open(file_path, 'r', newline='') as csvfile, open(TEMP_FILE_NAME, 'w', newline='') as tempfile:
             reader = csv.reader(csvfile, delimiter=',')
             writer = csv.writer(tempfile, delimiter=',')
             for index, row in enumerate(reader):
@@ -48,7 +49,7 @@ def save_cached_features(images_paths_features:dict[str, np.array], file_path, f
     except Exception as e:
         print(e)
 
-    with open('TEMP.csv', 'a', newline='') as tempfile:
+    with open(TEMP_FILE_NAME, 'a', newline='') as tempfile:
         writer = csv.writer(tempfile, delimiter=',')
         for (image_path, image_features) in images_paths_features.items():
             row = [image_path]
@@ -59,4 +60,4 @@ def save_cached_features(images_paths_features:dict[str, np.array], file_path, f
         os.remove(file_path)
     except FileNotFoundError as e:
         print(e)
-    os.rename('TEMP.csv', file_path)
+    os.rename(TEMP_FILE_NAME, file_path)

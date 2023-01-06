@@ -16,15 +16,17 @@ import cv2
 # TODO: add comments
 # TODO: add type hints
 
+DEFAULT_CACHE_FILE_PATH = 'cached_features.csv'
+
 class ProgramManager:
 
     def __init__(self):
         # Set default parameters, some of them will be updated with the config file if it exists
 
         self.images_path:str = ''
-        self.cache_file_path:str = 'cached_features.csv'
+        self.cache_file_path:str = DEFAULT_CACHE_FILE_PATH
         self.feature_extraction_method:str = 'vgg16'
-        self.distance_metric:str = 'cosine'
+        self.file_types:list[str] = ['.jpg', '.jpeg', '.png']
         self.clustering_method:str = 'affinity_propagation'
         self.feature_extraction_parameters:dict[str,any] = {}
         self.similarity_calculator:SimilarityCalculator = None
@@ -33,11 +35,12 @@ class ProgramManager:
         self.images_clusters:list[list[int]] = []
 
         self.force_recalculate_features:bool = False
-        self.save_calculated_features:bool = False
+        self.save_calculated_features:bool = True
 
         self.configFileManager = ConfigFileManager()
         self._read_config_file()
 
+    # TODO add exception checks if the config file is not valid, try to load the default values for each invalid parameter
     def _read_config_file(self): 
         images_path_in_file = self.configFileManager.get_config_parameter('paths', 'images_path')
         self.images_path = images_path_in_file if images_path_in_file != '' else self.images_path
@@ -46,7 +49,7 @@ class ProgramManager:
         self.cache_file_path = cache_file_path_in_file if cache_file_path_in_file != '' else self.cache_file_path
 
         self.feature_extraction_method = self.configFileManager.get_config_parameter('feature_extraction', 'method')
-        self.distance_metric = self.configFileManager.get_config_parameter('similarity', 'distance_metric')
+        self.file_types = self.configFileManager.get_config_parameter('file_types', 'supported').split(',')
         self.clustering_method = self.configFileManager.get_config_parameter('clustering', 'method')
         self.force_recalculate_features = True if self.configFileManager.get_config_parameter('cache', 'force_recalculate_features') == 'True' else False
         self.save_calculated_features = True if self.configFileManager.get_config_parameter('cache', 'save_calculated_features') == 'True' else False
@@ -54,8 +57,8 @@ class ProgramManager:
     def update_config_file(self):
         config_parameters = {}
         config_parameters['paths'] = {'images_path': self.images_path, 'cache_file_path': self.cache_file_path}
+        config_parameters['file_types'] = {'supported': ','.join(self.file_types)}
         config_parameters['feature_extraction'] = {'method': self.feature_extraction_method}
-        config_parameters['similarity'] = {'distance_metric': self.distance_metric}
         config_parameters['clustering'] = {'method': self.clustering_method}
         config_parameters['cache'] = {'force_recalculate_features': str(self.force_recalculate_features), 'save_calculated_features': str(self.save_calculated_features)}
         self.configFileManager.set_config_parameters(config_parameters)
@@ -63,12 +66,12 @@ class ProgramManager:
     def _set_feature_extraction_parameters(self, parameters:dict[str,any]={}):
         self.feature_extraction_parameters = parameters
 
+    def set_file_types(self, file_types:list[str]):
+        self.file_types = file_types
+
     def set_feature_extraction_method(self, feature_extraction_method:str, parameters:dict[str,any]={}):
         self.feature_extraction_method = feature_extraction_method
         self._set_feature_extraction_parameters(parameters)
-    
-    def set_distance_metric(self, distance_metric:str):
-        self.distance_metric = distance_metric
     
     def set_clustering_method(self, clustering_method:str):
         self.clustering_method = clustering_method
@@ -76,15 +79,20 @@ class ProgramManager:
     def set_images_path(self, images_path:str):
         self.images_path = images_path
 
+    def set_save_calculated_features(self, save_calculated_features:bool, cache_file_path:str=DEFAULT_CACHE_FILE_PATH):
+        self.save_calculated_features = save_calculated_features
+        self.cache_file_path = cache_file_path
+    
+    def set_force_recalculate_features(self, force_recalculate_features:bool):
+        self.force_recalculate_features = force_recalculate_features
+
     def run(self):
         # Search for images in path
-        # TODO give the option to search for images in subfolders or not
-        # TODO give the option to search for images of a specific file type
         # TODO give option to search in a group of folders
-        images_names_paths = file_searcher.file_search(self.images_path, ('.jpg', '.png'), True)
+        images_names_paths = file_searcher.file_search(self.images_path, tuple(self.file_types), False)
 
         if len(images_names_paths) == 0:
-            print("No images found in the specified path with the specified file types ('.jpg', '.png')")
+            print(f"No images found in the specified path with file types ({self.file_types})")
             return
 
         # Create dictionary
@@ -123,7 +131,8 @@ class ProgramManager:
 
         # Save features to cache file
         # If at least one image was loaded and the features need to be saved
-        if self.save_calculated_features and len(images_pixel_data) > 0: 
+        if self.save_calculated_features and len(images_pixel_data) > 0:
+            print("Saving calculated features to cache file")
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features
@@ -139,9 +148,13 @@ def main(images_path):
     programManager = ProgramManager()
 
     programManager.set_images_path(images_path)
+    programManager.set_file_types(['.jpg', '.png', '.jpeg'])
+    programManager.set_save_calculated_features(True)
+    programManager.set_force_recalculate_features(False)
     #programManager.set_feature_extraction_method('mobilenet')
     programManager.set_feature_extraction_method('vgg16')
     #programManager.set_feature_extraction_method('color_distribution', {'color_bins': 3})
+    
 
     # This shoud be done when the user selects all parameters and presses the "Run" button
     programManager.run()

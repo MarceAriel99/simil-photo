@@ -30,7 +30,7 @@ class ConfigFileManager:
         print("Creating config file...")
         self.config['paths'] = {'images_path': '', 'cache_file_path': ''}
         self.config['feature_extraction'] = {'method': 'vgg16'}
-        self.config['similarity'] = {'distance_metric': 'cosine'}
+        self.config['file_types'] = {'supported': ','.join(['.jpg', '.jpeg', '.png'])}
         self.config['clustering'] = {'method': 'affinity_propagation'}
         self.config['cache'] = {'force_recalculate_features': 'False', 'save_calculated_features': 'False'}
 

@@ -13,12 +13,9 @@ from FeatureExtractors.mobilenet_extractor import MobileNetFeatureExtractor
 
 class SimilarityCalculator():
 
-    def __init__(self, images_pixel_data, images_cached_features:dict[int,np.array]={}, feature_extraction_method='vgg16', distance_metric='cosine', clustering_method='affinity_propagation') -> None:
+    def __init__(self, images_pixel_data, images_cached_features:dict[int,np.array]={}, feature_extraction_method='vgg16', clustering_method='affinity_propagation') -> None:
 
         self.feature_extraction_method = feature_extraction_method # Could be 'color_distribution', 'vgg16', 'vgg19', 'resnet50'... Implement more methods
-
-        #TODO: Change this to a class 'DistanceCalculator' or interface because implementing more methods will make this class too big
-        self.distance_metric = distance_metric # Could be 'euclidean', 'cosine', 'manhattan'... Implement more methods?
 
         #TODO: Change this to a class 'ClusteringCalculator' or interface because implementing more methods will make this class too big
         self.clustering_method = clustering_method # Could be 'affinity_propagation', 'kmeans', 'dbscan'... Implement more methods
@@ -35,9 +32,6 @@ class SimilarityCalculator():
 
     def set_feature_extraction_parameters(self, parameters: dict) -> None:
         self.feature_extraction_parameters = parameters
-
-    def set_distance_metric(self, distance_metric: str) -> None:
-        self.distance_metric = distance_metric
 
     def set_clustering_method(self, clustering_method: str) -> None:
         self.clustering_method = clustering_method
@@ -93,9 +87,6 @@ class SimilarityCalculator():
         return images_features
 
     def _calculate_similarity_matrix(self, images_features) -> np.ndarray:
-
-        if self.distance_metric != 'cosine':
-            raise Exception(f"Distance metric '{self.distance_metric}' not implemented")
 
         # The array has to be ordered by id, because the cluster uses the index of the array as the id of the image
         features_array = [[] for _ in range(len(images_features))]

@@ -1,7 +1,7 @@
 import csv
+import os
 import numpy as np
 
-# TODO manage exceptions
 def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int, np.array]:
 
     cached_features = {}
@@ -18,16 +18,43 @@ def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int
                 cached_features[image_id] = image_features
     except FileNotFoundError:
         print('Cached features file not found')
+    except Exception as e:
+        print(e)
 
     return cached_features
 
-# TODO manage exceptions
-# TODO don't overwrite existing features, if they exist, override, otherwise append
-def save_cached_features(images_paths_features:dict[str, np.array], file_path): 
+# TODO manage exceptions (see other exeptions in addition to FileNotFoundError)
+def save_cached_features(images_paths_features:dict[str, np.array], file_path, force_overwrite:bool = False):
 
-    with open(file_path, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile, delimiter=',')
+    if force_overwrite: print("Force overwrite is enabled, this will overwrite all the cached features")
+
+    try:
+        with open(file_path, 'r', newline='') as csvfile, open('TEMP.csv', 'w', newline='') as tempfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            writer = csv.writer(tempfile, delimiter=',')
+            for index, row in enumerate(reader):
+                image_path = row[0]
+                if image_path in images_paths_features.keys() or force_overwrite: #If the path in the file is in the dict, then override it
+                    row = [image_path]
+                    row.extend(images_paths_features[image_path])
+                    writer.writerow(row)
+                    del images_paths_features[image_path]
+                else: #If the path in the file is not in the dict, then just copy it
+                    writer.writerow(row)
+    except FileNotFoundError:
+        print('Cached features file not found')
+    except Exception as e:
+        print(e)
+
+    with open('TEMP.csv', 'a', newline='') as tempfile:
+        writer = csv.writer(tempfile, delimiter=',')
         for (image_path, image_features) in images_paths_features.items():
             row = [image_path]
             row.extend(image_features)
             writer.writerow(row)
+
+    try:
+        os.remove(file_path)
+    except FileNotFoundError as e:
+        print(e)
+    os.rename('TEMP.csv', file_path)

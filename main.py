@@ -87,7 +87,8 @@ class ProgramManager:
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
         # TODO Check if the features were calculated with the same parameters, if not, recalculate them
-        if self.force_recalculate_features or self.feature_extraction_method != self.configFileManager.get_config_parameter('feature_extraction', 'method'):
+        feature_extraction_method_changed:bool = self.feature_extraction_method != self.configFileManager.get_config_parameter('feature_extraction', 'method')
+        if self.force_recalculate_features or feature_extraction_method_changed:
             print("Forcing recalculation of features")
             images_cached_features = {}       
         else:
@@ -113,13 +114,14 @@ class ProgramManager:
         # Run similarity calculator
         self.images_clusters = similarity_calculator.run()
 
-        # Save cached features
-        if self.save_calculated_features:
+        # Save features to cache file
+        # If at least one image was loaded and the features need to be saved
+        if self.save_calculated_features and len(images_pixel_data) > 0: 
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features
             
-            cached_features_file_manager.save_cached_features(images_paths_features, self.cache_file_path)
+            cached_features_file_manager.save_cached_features(images_paths_features, self.cache_file_path, feature_extraction_method_changed)
 
         # Filter clusters with only one image
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
@@ -130,7 +132,9 @@ def main(images_path):
     programManager = ProgramManager()
 
     programManager.set_images_path(images_path)
+    #programManager.set_feature_extraction_method('mobilenet')
     programManager.set_feature_extraction_method('vgg16')
+    #programManager.set_feature_extraction_method('color_distribution', {'color_bins': 3})
 
     # This shoud be done when the user selects all parameters and presses the "Run" button
     programManager.run()
@@ -145,6 +149,8 @@ def main(images_path):
         cluster_list = []
         for image_id in cluster:
             img = cv2.imread(images_ids_paths.get(image_id))
+            if img is None: # TODO check how to handle files with non ascii characters (rename them?)
+                continue
             img = cv2.resize(img, (img.shape[1] // 5, img.shape[0] // 5))
             cluster_list.append(img)
             print(images_ids_paths.get(image_id).split("\\")[-1])

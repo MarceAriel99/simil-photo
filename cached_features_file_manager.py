@@ -2,6 +2,8 @@ import csv
 import os
 import numpy as np
 
+# TODO: Make 'TEMP.csv' a constant
+
 def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int, np.array]:
 
     cached_features = {}

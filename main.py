@@ -10,6 +10,12 @@ import numpy as np
 import keras.utils as image
 import cv2
 
+# TODO: add constants for the config file parameters
+# TODO: add exception checks everywhere
+# TODO: add logging
+# TODO: add comments
+# TODO: add type hints
+
 class ProgramManager:
 
     def __init__(self):
@@ -32,7 +38,7 @@ class ProgramManager:
         self.configFileManager = ConfigFileManager()
         self._read_config_file()
 
-    def _read_config_file(self):
+    def _read_config_file(self): 
         images_path_in_file = self.configFileManager.get_config_parameter('paths', 'images_path')
         self.images_path = images_path_in_file if images_path_in_file != '' else self.images_path
 
@@ -72,9 +78,10 @@ class ProgramManager:
 
     def run(self):
         # Search for images in path
-        # TODO give the option to search for images in subfolders
+        # TODO give the option to search for images in subfolders or not
         # TODO give the option to search for images of a specific file type
-        images_names_paths = file_searcher.file_search(self.images_path, ('.jpg', '.png'))
+        # TODO give option to search in a group of folders
+        images_names_paths = file_searcher.file_search(self.images_path, ('.jpg', '.png'), True)
 
         if len(images_names_paths) == 0:
             print("No images found in the specified path with the specified file types ('.jpg', '.png')")

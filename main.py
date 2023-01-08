@@ -1,9 +1,9 @@
 import sys
 
 import numpy as np
-from config_file_manager import ConfigFileManager
-import file_searcher
-import cached_features_file_manager
+from FilesManagers.config_file_manager import ConfigFileManager
+import FilesManagers.file_searcher as file_searcher
+import FilesManagers.cached_features_file_manager as cached_features_file_manager
 from similarity_calculator import SimilarityCalculator
 
 import numpy as np
@@ -148,11 +148,11 @@ def main(images_path):
     programManager = ProgramManager()
 
     programManager.set_images_path(images_path)
-    programManager.set_file_types(['.jpg', '.png', '.jpeg'])
+    programManager.set_file_types(['.jpg', '.png', '.jpeg', '.webp'])
     programManager.set_save_calculated_features(True)
     programManager.set_force_recalculate_features(False)
-    #programManager.set_feature_extraction_method('mobilenet')
-    programManager.set_feature_extraction_method('vgg16')
+    programManager.set_feature_extraction_method('mobilenet')
+    #programManager.set_feature_extraction_method('vgg16')
     #programManager.set_feature_extraction_method('color_distribution', {'color_bins': 3})
     
 

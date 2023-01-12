@@ -1,4 +1,5 @@
 import random
+from tkinter import filedialog
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image, ImageOps
@@ -42,8 +43,6 @@ class DynamicGrid(tk.Frame):
         self.text.delete("1.0", "end")
         self.text.configure(state="disabled")
         
-        
-
 class View(tk.Tk):
 
     def __init__(self):
@@ -52,7 +51,6 @@ class View(tk.Tk):
         self.title('SimilPhoto')
         self.minsize(width=800, height=600)
         self.geometry('1200x680')
-        self.img = ImageTk.PhotoImage(Image.open("E:\Mis_Archivos\Proyects\Programs\SimilPhoto\Images\gato.jpg").resize((100, 100)))
 
     def init_ui(self, presenter):
         print("Initializing UI")
@@ -60,35 +58,101 @@ class View(tk.Tk):
 
     def _create_widgets(self, presenter):
         print("Creating widgets")
-        self.frame = tk.Frame(self, padx=10, pady=10)
-        self.frame.pack(fill=tk.BOTH, expand=True)
+        self.main_frame = tk.Frame(self, padx=10, pady=10, bg="yellow")
+        self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.status_label = tk.Label(self.frame, text="Image Clustering")
-        self.status_label.pack(side=tk.TOP, anchor=tk.NW)
+        self.top_bar = tk.Frame(self.main_frame, bg="red")
+        self.images_grid = tk.Frame(self.main_frame, bg="blue")
+        self.config_panel = tk.Frame(self.main_frame, bg="green", padx=10, pady=10)
+
+        self.main_frame.grid_columnconfigure(0, weight=1)
+        self.main_frame.grid_rowconfigure(1, weight=1)
+
+        self._create_top_bar()
+        self._create_images_grid(presenter)
+        self._create_config_panel(presenter)
+
+        self.top_bar.grid(row=0, column=0, sticky="new")
+        self.images_grid.grid(row=1, column=0, sticky="nsew")
+        self.config_panel.grid(row=0, column=1, rowspan=2, sticky="nsew")
+
+    def _create_top_bar(self):
+
+        self.groups_label = tk.Label(self.top_bar, text="0 Groups found!")
+        self.groups_label.pack(side=tk.LEFT)
+
+        self.rigth_arrow = tk.Button(self.top_bar, text=">")
+        self.rigth_arrow.pack(side=tk.RIGHT)
+        self.current_group_label = tk.Label(self.top_bar, text="0/0")
+        self.current_group_label.pack(side=tk.RIGHT)
+        self.left_arrow = tk.Button(self.top_bar, text="<")
+        self.left_arrow.pack(side=tk.RIGHT)
+
+    def _create_images_grid(self, presenter):
+        self.gridframe = DynamicGrid(self.images_grid, self)
+        self.gridframe.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    def _create_config_panel(self, presenter):
+        self.config_title_label = tk.Label(self.config_panel, text="Configuration", font=("Arial", 20))
+        self.config_title_label.grid(row=0, column=0, sticky="nw")
+        self.file_search_frame = tk.Frame(self.config_panel)
+        self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=20)
+
+        self._create_file_search_submenu(presenter)
+
 
         self.run_button = tk.Button(
-            self.frame,
+            self.config_panel,
             text="RUN",
             width=6,
             pady=5,
         )
-        self.run_button.pack(side=tk.BOTTOM, anchor=tk.E)
+        self.run_button.grid(row=2, column=0, sticky="nsew")
         self.run_button.bind("<Button-1>", presenter.handle_run_button_click)
 
-        self.gridframe = DynamicGrid(self.frame, self)
-        self.gridframe.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+    def _create_file_search_submenu(self, presenter):
 
-        # self.gridframe = tk.Frame(self, padx=10, pady=10)
-        # self.gridframe.pack(fill=tk.BOTH, expand=True)      
+        self.file_search_title_label = tk.Label(self.file_search_frame, text="File search", font=("Arial", 15, 'bold', 'underline'))
+        self.path_label = tk.Label(self.file_search_frame, text="Searching for images in path:")
+        self.path_entry = tk.Entry(self.file_search_frame, width=40)
+        self.subdirectories_label = tk.Label(self.file_search_frame, text="Include subdirectories")
+        self.subdirectories_checkbox = tk.Checkbutton(self.file_search_frame, variable=tk.IntVar())
+        self.select_folder_button = tk.Button(self.file_search_frame, text="Select folder", width=10)
+        self.select_folder_button.bind("<Button-1>", presenter.handle_select_folder_button_click)
+        self.file_types_frame = tk.Frame(self.file_search_frame,)
+        self.file_types_label = tk.Label(self.file_types_frame, text="File types:")
+        self.jpg_label = tk.Label(self.file_types_frame, text="JPG")
+        self.jpg_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
+        self.jpeg_label = tk.Label(self.file_types_frame, text="JPEG")
+        self.jpeg_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
+        self.png_label = tk.Label(self.file_types_frame, text="PNG")
+        self.png_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
+        self.webp_label = tk.Label(self.file_types_frame, text="WEBP")
+        self.webp_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
 
-        # button1=tk.Button(self.gridframe, image=self.img)
-        # button1.grid(row=0,column=0)
-        # button2=tk.Button(self.gridframe, image=self.img)
-        # button2.grid(row=0,column=1)
-        # button3=tk.Button(self.gridframe, image=self.img)
-        # button3.grid(row=0,column=2)
-        # button4=tk.Button(self.gridframe, image=self.img)
-        # button4.grid(row=0,column=3)
+        self.file_types_label.pack(side=tk.LEFT, padx=(0,10))
+        self.jpg_label.pack(side=tk.LEFT, padx=(10,0))
+        self.jpg_checkbox.pack(side=tk.LEFT, padx=(0,10))
+        self.jpeg_label.pack(side=tk.LEFT, padx=(10,0))
+        self.jpeg_checkbox.pack(side=tk.LEFT, padx=(0,10))
+        self.png_label.pack(side=tk.LEFT, padx=(10,0))
+        self.png_checkbox.pack(side=tk.LEFT, padx=(0,10))
+        self.webp_label.pack(side=tk.LEFT, padx=(10,0))
+        self.webp_checkbox.pack(side=tk.LEFT, padx=(0,10))
+
+        self.file_search_title_label.grid(row=0, column=0, columnspan=3, sticky=tk.W, pady=(0,10))
+        self.path_label.grid(row=1, column=0, sticky=tk.W, padx=(0,10), pady=5)
+        self.path_entry.grid(row=1, column=1, columnspan=2, sticky=tk.W, padx=(10,0), pady=5)
+        self.subdirectories_label.grid(row=2, column=0, sticky=tk.W, pady=5)
+        self.subdirectories_checkbox.grid(row=2, column=1, sticky=tk.W, pady=5)
+        self.select_folder_button.grid(row=2, column=2, sticky=tk.E, pady=5)
+        self.file_types_frame.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=(5,0))
+
+    def select_folder(self) -> str:
+        folder_path = filedialog.askdirectory()
+        self.path_entry.delete(0, tk.END)
+        self.path_entry.insert(0, folder_path)
+        return folder_path
 
     def load_and_display_images(self, images_paths:list[str]):
         print("Loading images")
@@ -96,6 +160,5 @@ class View(tk.Tk):
         for image_path in images_paths:
             self.gridframe.add_box(image_path)
 
-
     def update_status_label(self, text):
-        self.status_label.configure(text=text)
+        self.groups_label.configure(text=text)

@@ -50,7 +50,7 @@ class View(tk.Tk):
         super().__init__()
         self.title('SimilPhoto')
         self.minsize(width=800, height=600)
-        self.geometry('1200x680')
+        self.geometry('1400x680')
 
     def init_ui(self, presenter):
         print("Initializing UI")
@@ -58,17 +58,17 @@ class View(tk.Tk):
 
     def _create_widgets(self, presenter):
         print("Creating widgets")
-        self.main_frame = tk.Frame(self, padx=10, pady=10, bg="yellow")
+        self.main_frame = tk.Frame(self, padx=10, pady=10)#, bg="yellow")
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.top_bar = tk.Frame(self.main_frame, bg="red")
-        self.images_grid = tk.Frame(self.main_frame, bg="blue")
-        self.config_panel = tk.Frame(self.main_frame, bg="green", padx=10, pady=10)
+        self.top_bar = tk.Frame(self.main_frame)#, bg="red")
+        self.images_grid = tk.Frame(self.main_frame)#, bg="blue")
+        self.config_panel = tk.Frame(self.main_frame, padx=10, pady=10)#, bg="green")
 
         self.main_frame.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_rowconfigure(1, weight=1)
 
-        self._create_top_bar()
+        self._create_top_bar(presenter)
         self._create_images_grid(presenter)
         self._create_config_panel(presenter)
 
@@ -76,17 +76,19 @@ class View(tk.Tk):
         self.images_grid.grid(row=1, column=0, sticky="nsew")
         self.config_panel.grid(row=0, column=1, rowspan=2, sticky="nsew")
 
-    def _create_top_bar(self):
+    def _create_top_bar(self, presenter):
 
-        self.groups_label = tk.Label(self.top_bar, text="0 Groups found!")
+        self.groups_label = tk.Label(self.top_bar, text="")
         self.groups_label.pack(side=tk.LEFT)
 
-        self.rigth_arrow = tk.Button(self.top_bar, text=">")
-        self.rigth_arrow.pack(side=tk.RIGHT)
+        self.rigth_arrow_button = tk.Button(self.top_bar, text=">")
+        self.rigth_arrow_button.bind("<Button-1>", presenter.handle_next_group_button_click)
+        self.rigth_arrow_button.pack(side=tk.RIGHT)
         self.current_group_label = tk.Label(self.top_bar, text="0/0")
         self.current_group_label.pack(side=tk.RIGHT)
-        self.left_arrow = tk.Button(self.top_bar, text="<")
-        self.left_arrow.pack(side=tk.RIGHT)
+        self.left_arrow_button = tk.Button(self.top_bar, text="<")
+        self.left_arrow_button.bind("<Button-1>", presenter.handle_previous_group_button_click)
+        self.left_arrow_button.pack(side=tk.RIGHT)
 
     def _create_images_grid(self, presenter):
         self.gridframe = DynamicGrid(self.images_grid, self)
@@ -99,7 +101,6 @@ class View(tk.Tk):
         self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=20)
 
         self._create_file_search_submenu(presenter)
-
 
         self.run_button = tk.Button(
             self.config_panel,
@@ -114,7 +115,7 @@ class View(tk.Tk):
 
         self.file_search_title_label = tk.Label(self.file_search_frame, text="File search", font=("Arial", 15, 'bold', 'underline'))
         self.path_label = tk.Label(self.file_search_frame, text="Searching for images in path:")
-        self.path_entry = tk.Entry(self.file_search_frame, width=40)
+        self.path_entry = tk.Entry(self.file_search_frame, width=50)
         self.subdirectories_label = tk.Label(self.file_search_frame, text="Include subdirectories")
         self.subdirectories_checkbox = tk.Checkbutton(self.file_search_frame, variable=tk.IntVar())
         self.select_folder_button = tk.Button(self.file_search_frame, text="Select folder", width=10)
@@ -148,10 +149,17 @@ class View(tk.Tk):
         self.select_folder_button.grid(row=2, column=2, sticky=tk.E, pady=5)
         self.file_types_frame.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=(5,0))
 
+    def update_folder_path_entry(self, path):
+        self.path_entry.delete(0, tk.END)
+        self.path_entry.insert(0, path)
+
     def select_folder(self) -> str:
         folder_path = filedialog.askdirectory()
-        self.path_entry.delete(0, tk.END)
-        self.path_entry.insert(0, folder_path)
+
+        if folder_path != "":
+            self.path_entry.delete(0, tk.END)
+            self.path_entry.insert(0, folder_path)
+
         return folder_path
 
     def load_and_display_images(self, images_paths:list[str]):

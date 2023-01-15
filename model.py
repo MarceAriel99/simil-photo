@@ -2,13 +2,13 @@ from main_old import ProgramManager
 
 class Model:
     def __init__(self) -> None:
-        print("Model created")
-        
+        print("Model created")  
         self.programManager = ProgramManager()
 
-        images_path = "..\Images"
+    def init_model(self, presenter) -> None:
+        print("Model init")
+        self.presenter = presenter
 
-        self.programManager.set_images_path(images_path)
         self.programManager.set_file_types(['.jpg', '.png', '.jpeg', '.webp'])
         self.programManager.set_save_calculated_features(True)
         self.programManager.set_force_recalculate_features(False)
@@ -20,6 +20,8 @@ class Model:
 
         self.images_ids_paths = self.programManager.images_ids_paths
         self.images_clusters = self.programManager.images_clusters
+
+        self.presenter.run_completed()
 
     def get_images_paths(self) -> list[list[str]]:
 

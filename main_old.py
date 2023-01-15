@@ -79,6 +79,9 @@ class ProgramManager:
     def set_images_path(self, images_path:str):
         self.images_path = images_path
 
+    def get_images_path(self):
+        return self.images_path
+
     def set_save_calculated_features(self, save_calculated_features:bool, cache_file_path:str=DEFAULT_CACHE_FILE_PATH):
         self.save_calculated_features = save_calculated_features
         self.cache_file_path = cache_file_path
@@ -87,8 +90,13 @@ class ProgramManager:
         self.force_recalculate_features = force_recalculate_features
 
     def run(self):
+
+        self.images_ids_paths = {}
+        self.images_clusters = []
+
         # Search for images in path
         # TODO give option to search in a group of folders
+        print(f"Searching for images in {self.images_path} with file types ({self.file_types})")
         images_names_paths = file_searcher.file_search(self.images_path, tuple(self.file_types), False)
 
         if len(images_names_paths) == 0:

@@ -94,13 +94,20 @@ class View(tk.Tk):
         self.gridframe = DynamicGrid(self.images_grid, self)
         self.gridframe.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
+    #TODO Config panel should be a class
     def _create_config_panel(self, presenter):
         self.config_title_label = tk.Label(self.config_panel, text="Configuration", font=("Arial", 20))
         self.config_title_label.grid(row=0, column=0, sticky="nw")
         self.file_search_frame = tk.Frame(self.config_panel)
         self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=20)
+        ttk.Separator(self.config_panel, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=10)
+        self.features_frame = tk.Frame(self.config_panel)
+        self.features_frame.grid(row=3, column=0, sticky="nsew", pady=20)
+        ttk.Separator(self.config_panel, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=10)
 
         self._create_file_search_submenu(presenter)
+        self._create_features_submenu(presenter)
+        
 
         self.run_button = tk.Button(
             self.config_panel,
@@ -108,7 +115,7 @@ class View(tk.Tk):
             width=6,
             pady=5,
         )
-        self.run_button.grid(row=2, column=0, sticky="nsew")
+        self.run_button.grid(row=5, column=0, sticky="nsew")
         self.run_button.bind("<Button-1>", presenter.handle_run_button_click)
 
     def _create_file_search_submenu(self, presenter):
@@ -117,19 +124,26 @@ class View(tk.Tk):
         self.path_label = tk.Label(self.file_search_frame, text="Searching for images in path:")
         self.path_entry = tk.Entry(self.file_search_frame, width=50)
         self.subdirectories_label = tk.Label(self.file_search_frame, text="Include subdirectories")
-        self.subdirectories_checkbox = tk.Checkbutton(self.file_search_frame, variable=tk.IntVar())
+        self.check_subdirectories_var = tk.BooleanVar()
+        self.subdirectories_checkbox = tk.Checkbutton(self.file_search_frame, variable=self.check_subdirectories_var)
         self.select_folder_button = tk.Button(self.file_search_frame, text="Select folder", width=10)
         self.select_folder_button.bind("<Button-1>", presenter.handle_select_folder_button_click)
+
         self.file_types_frame = tk.Frame(self.file_search_frame,)
         self.file_types_label = tk.Label(self.file_types_frame, text="File types:")
         self.jpg_label = tk.Label(self.file_types_frame, text="JPG")
-        self.jpg_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
+        self.jpg_var = tk.BooleanVar()
+        self.jpg_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.jpg_var)
         self.jpeg_label = tk.Label(self.file_types_frame, text="JPEG")
-        self.jpeg_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
+        self.jpeg_var = tk.BooleanVar()
+        self.jpeg_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.jpeg_var)
         self.png_label = tk.Label(self.file_types_frame, text="PNG")
-        self.png_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
+        self.png_var = tk.BooleanVar()
+        self.png_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.png_var)
         self.webp_label = tk.Label(self.file_types_frame, text="WEBP")
-        self.webp_checkbox = tk.Checkbutton(self.file_types_frame, variable=tk.IntVar())
+        self.webp_var = tk.BooleanVar()
+        self.webp_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.webp_var)
+        self.file_types_variables = {'jpg': self.jpg_var, 'jpeg': self.jpeg_var, 'png': self.png_var, 'webp': self.webp_var}
 
         self.file_types_label.pack(side=tk.LEFT, padx=(0,10))
         self.jpg_label.pack(side=tk.LEFT, padx=(10,0))
@@ -149,6 +163,12 @@ class View(tk.Tk):
         self.select_folder_button.grid(row=2, column=2, sticky=tk.E, pady=5)
         self.file_types_frame.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=(5,0))
 
+    def _create_features_submenu(self, presenter):
+        self.features_title_label = tk.Label(self.features_frame, text="Features", font=("Arial", 15, 'bold', 'underline'))
+
+        self.features_title_label.grid(row=0, column=0, columnspan=3, sticky=tk.W, pady=(0,10))
+        pass
+
     def update_folder_path_entry(self, path):
         self.path_entry.delete(0, tk.END)
         self.path_entry.insert(0, path)
@@ -163,7 +183,6 @@ class View(tk.Tk):
         return folder_path
 
     def load_and_display_images(self, images_paths:list[str]):
-        print("Loading images")
         self.gridframe.delete_all_boxes()
         for image_path in images_paths:
             self.gridframe.add_box(image_path)

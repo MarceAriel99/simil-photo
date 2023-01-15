@@ -5,7 +5,7 @@ Receives a string representing the root directory and a tuple of searched extens
 Returns a dictionary with key -> file_name, value -> file_directory
 '''
 
-def file_search(root_directory:str, extensions:tuple[str], search_in_root_only:bool=False) -> dict[str, str]:
+def file_search(root_directory:str, extensions:tuple[str], search_subdirectories:bool=True) -> dict[str, str]:
 
     result = {}
 
@@ -13,7 +13,7 @@ def file_search(root_directory:str, extensions:tuple[str], search_in_root_only:b
         #print(f"Root: {root}")
         #print(f"Dirs: {dirs}")
         #print(f"Files: {files}")
-        if search_in_root_only and root != root_directory:
+        if not search_subdirectories and root != root_directory:
             break 
         for file_name in files:
             if file_name.endswith(extensions):

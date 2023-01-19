@@ -97,9 +97,15 @@ class Model:
     def set_save_calculated_features(self, save_calculated_features:bool, cache_file_path:str=DEFAULT_CACHE_FILE_PATH):
         self.save_calculated_features = save_calculated_features
         self.cache_file_path = cache_file_path
+
+    def get_save_calculated_features(self) -> bool:
+        return self.save_calculated_features
     
     def set_force_recalculate_features(self, force_recalculate_features:bool):
         self.force_recalculate_features = force_recalculate_features
+
+    def get_force_recalculate_features(self) -> bool:
+        return self.force_recalculate_features
 
     def run(self, presenter):
 

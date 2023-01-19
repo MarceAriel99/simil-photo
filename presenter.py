@@ -19,11 +19,13 @@ class Presenter:
         self.view.png_checkbox.select() if ".png" in self.model.get_file_types() else self.view.png_checkbox.deselect()
         self.view.jpeg_checkbox.select() if ".jpeg" in self.model.get_file_types() else self.view.jpeg_checkbox.deselect()
         self.view.webp_checkbox.select() if ".webp" in self.model.get_file_types() else self.view.webp_checkbox.deselect()
+        self.view.cache_features_checkbox.select() if self.model.get_save_calculated_features() else self.view.cache_features_checkbox.deselect()
+        self.view.force_recalculate_features_checkbox.select() if self.model.get_force_recalculate_features() else self.view.force_recalculate_features_checkbox.deselect()
         
     def _apply_config_to_model(self) -> None:
         #These parameters should be read from the view
         self.model.set_images_path(self.view.path_entry.get())
-        self.model.set_check_subdirectories(self.view.check_subdirectories_var.get())
+        self.model.set_check_subdirectories(self.view.subdirectories_var.get())
         self.model.set_file_types(["."+file_type_name for file_type_name, value in self.view.file_types_variables.items() if value.get()])
         self.model.set_save_calculated_features(True)
         self.model.set_force_recalculate_features(False)
@@ -53,6 +55,13 @@ class Presenter:
             self.current_cluster -= 1
             self.view.load_and_display_images(self.clusters[self.current_cluster])
             self.view.current_group_label.config(text=f"{self.current_cluster + 1} / {len(self.clusters)}")
+
+    def on_feature_extraction_method_selected(self, event=None) -> None:
+        # This should be done in view, because I need Tk to update the text box. Should be a method in view
+        self.view.feature_extraction_textbox.config(state='normal')
+        self.view.feature_extraction_textbox.delete('1.0', 'end')
+        self.view.feature_extraction_textbox.insert('end', "Description of: " + self.view.feature_extraction_listbox.get(self.view.feature_extraction_listbox.curselection()[0]))
+        self.view.feature_extraction_textbox.config(state='disabled')
 
     def handle_select_folder_button_click(self, event=None) -> None:
         self.view.update_status_label("Selecting folder...")

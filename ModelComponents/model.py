@@ -119,6 +119,7 @@ class Model:
 
         if len(images_names_paths) == 0:
             print(f"No images found in the specified path with file types ({self.file_types})")
+            presenter.run_completed()
             return
 
         # Create dictionary

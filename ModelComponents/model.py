@@ -54,7 +54,8 @@ class Model:
         self.clustering_method = self.configFileManager.get_config_parameter('clustering', 'method')
         self.force_recalculate_features = True if self.configFileManager.get_config_parameter('cache', 'force_recalculate_features') == 'True' else False
         self.save_calculated_features = True if self.configFileManager.get_config_parameter('cache', 'save_calculated_features') == 'True' else False
-        self.check_subdirectories = True if self.configFileManager.get_config_parameter('misc', 'check_subdirectories') == 'True' else False
+        self.cached_features_method = self.configFileManager.get_config_parameter('cache', 'method')
+        self.check_subdirectories = True if self.configFileManager.get_config_parameter('misc', 'check_subdirectories') == 'True' else False     
 
     def update_config_file(self):
         config_parameters = {}
@@ -63,7 +64,9 @@ class Model:
         config_parameters['file_types'] = {'supported': ','.join(self.file_types)}
         config_parameters['feature_extraction'] = {'method': self.feature_extraction_method}
         config_parameters['clustering'] = {'method': self.clustering_method}
-        config_parameters['cache'] = {'force_recalculate_features': str(self.force_recalculate_features), 'save_calculated_features': str(self.save_calculated_features)}
+        config_parameters['cache'] = {'force_recalculate_features': str(self.force_recalculate_features), 
+        'save_calculated_features': str(self.save_calculated_features), 
+        'method': self.cached_features_method }
         self.configFileManager.set_config_parameters(config_parameters)
 
     def _set_feature_extraction_parameters(self, parameters:dict[str,any]={}):
@@ -129,7 +132,9 @@ class Model:
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
         # TODO Check if the features were calculated with the same parameters, if not, recalculate them
-        feature_extraction_method_changed:bool = self.feature_extraction_method != self.configFileManager.get_config_parameter('feature_extraction', 'method')
+        print(f"Selected feature extraction method: {self.feature_extraction_method}")
+        print(f"File saved feature extraction method: {self.configFileManager.get_config_parameter('cache', 'method')}")
+        feature_extraction_method_changed:bool = self.feature_extraction_method != self.configFileManager.get_config_parameter('cache', 'method')
         if self.force_recalculate_features or feature_extraction_method_changed:
             print("Forcing recalculation of features")
             images_cached_features = {}       
@@ -160,6 +165,7 @@ class Model:
         # If at least one image was loaded and the features need to be saved
         if self.save_calculated_features and len(images_pixel_data) > 0:
             print("Saving calculated features to cache file")
+            self.cached_features_method = self.feature_extraction_method
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features

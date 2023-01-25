@@ -7,7 +7,7 @@ from keras.applications.vgg16 import preprocess_input
 from sklearn.cluster import AffinityPropagation
 from sklearn.metrics.pairwise import cosine_similarity
 
-from FeatureExtractors.color_distribution_extractor import ColorDistributionFeatureExtractor
+from FeatureExtractors.color_histogram_extractor import ColorHistogramFeatureExtractor
 from FeatureExtractors.vgg16_extractor import VGG16FeatureExtractor
 from FeatureExtractors.mobilenet_extractor import MobileNetFeatureExtractor
 
@@ -15,7 +15,7 @@ class SimilarityCalculator():
 
     def __init__(self, images_pixel_data, images_cached_features:dict[int,np.array]={}, feature_extraction_method='vgg16', clustering_method='affinity_propagation') -> None:
 
-        self.feature_extraction_method = feature_extraction_method # Could be 'color_distribution', 'vgg16', 'vgg19', 'resnet50'... Implement more methods
+        self.feature_extraction_method = feature_extraction_method # Could be 'color_histogram', 'vgg16', 'vgg19', 'resnet50'... Implement more methods
 
         #TODO: Change this to a class 'ClusteringCalculator' or interface because implementing more methods will make this class too big
         self.clustering_method = clustering_method # Could be 'affinity_propagation', 'kmeans', 'dbscan'... Implement more methods
@@ -66,8 +66,8 @@ class SimilarityCalculator():
                 feature_extractor = VGG16FeatureExtractor(self.feature_extraction_parameters)
             case 'mobilenet':
                 feature_extractor = MobileNetFeatureExtractor(self.feature_extraction_parameters)
-            case 'color_distribution':
-                feature_extractor = ColorDistributionFeatureExtractor(self.feature_extraction_parameters)
+            case 'color_histogram':
+                feature_extractor = ColorHistogramFeatureExtractor(self.feature_extraction_parameters)
             case _:
                 raise Exception(f"Feature extraction method '{self.feature_extraction_method}' not implemented")
 

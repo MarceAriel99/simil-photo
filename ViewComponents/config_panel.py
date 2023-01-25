@@ -75,17 +75,25 @@ class ConfigPanel(tk.Frame):
         self.file_types_frame.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=(5,0))
 
     def _create_feature_extraction_submenu(self, presenter):
+
         self.feature_extraction_title_label = tk.Label(self.features_frame, text="Feature extraction", font=("Arial", 15, 'bold', 'underline'))
+
         self.feature_extraction_method_label = tk.Label(self.features_frame, text="Feature extraction method:")
-        items = ['vgg_16', 'mobilenet', 'color_histogram']
+
+        items = ['vgg16', 'mobilenet', 'color_histogram'] # TODO This item list should be connected with the switch in the model
         list_items = tk.Variable(value=items)
-        self.feature_extraction_listbox = tk.Listbox(self.features_frame, listvariable=list_items, selectmode=tk.SINGLE, width=25, height=10)
-        self.feature_extraction_listbox.bind('<<ListboxSelect>>', presenter.on_feature_extraction_method_selected)
-        self.feature_extraction_textbox = tk.Text(self.features_frame, width=40, height=12, state=tk.DISABLED)
+        self.feature_extraction_listbox = tk.Listbox(self.features_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6)
+        self.feature_extraction_listbox.bind('<<ListboxSelect>>', self._on_feature_extraction_method_selected)
+        self.feature_extraction_textbox = tk.Text(self.features_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD)
+        self.feature_extraction_listbox.select_set(0)
+        self._on_feature_extraction_method_selected(None)
+
         self.feature_cache_recalculate_frame = tk.Frame(self.features_frame)
+
         self.cache_features_label = tk.Label(self.feature_cache_recalculate_frame, text="Cache image features")
         self.cache_features_var = tk.BooleanVar()
         self.cache_features_checkbox = tk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.cache_features_var)
+
         self.force_recalculate_features_label = tk.Label(self.feature_cache_recalculate_frame, text="Force recalculate features")
         self.force_recalculate_features_var = tk.BooleanVar()
         self.force_recalculate_features_checkbox = tk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.force_recalculate_features_var)
@@ -101,9 +109,25 @@ class ConfigPanel(tk.Frame):
         self.force_recalculate_features_checkbox.pack(side=tk.LEFT)
         self.feature_cache_recalculate_frame.grid(row=3, column=0, columnspan=4, sticky=tk.W)
 
-    def update_folder_path_entry(self, path):
+    def _on_feature_extraction_method_selected(self, event):
+        method = self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())
+        self.update_feature_extraction_textbox(method + " TODO GET THIS FROM SOMEWHERE")
+
+    def update_feature_extraction_textbox(self, text):
+        self.feature_extraction_textbox.config(state=tk.NORMAL)
+        self.feature_extraction_textbox.delete(1.0, tk.END)
+        self.feature_extraction_textbox.insert(tk.END, text)
+        self.feature_extraction_textbox.config(state=tk.DISABLED)
+
+    def update_path_entry(self, path):
         self.path_entry.delete(0, tk.END)
         self.path_entry.insert(0, path)
+
+    def set_path_entry_highlight(self, highlight:bool=True):
+        if highlight:
+            self.path_entry.config(highlightbackground="red", highlightcolor="red", highlightthickness=2)
+        else:
+            self.path_entry.config(highlightthickness=0)
 
     def select_folder(self) -> str:
         folder_path = filedialog.askdirectory()
@@ -113,3 +137,22 @@ class ConfigPanel(tk.Frame):
             self.path_entry.insert(0, folder_path)
         
         return folder_path
+
+    def get_images_path(self) -> str:
+        return self.path_entry.get()
+
+    def get_subdirectories_checkbox_state(self) -> bool:
+        return self.subdirectories_var.get()
+
+    def get_file_types_variables(self) -> dict[str, tk.BooleanVar]:
+        return self.file_types_variables
+
+    def get_selected_feature_extraction_method(self) -> str:
+        print(self.feature_extraction_listbox.get(tk.ACTIVE))
+        return self.feature_extraction_listbox.get(tk.ACTIVE)
+
+    def get_cache_features_checkbox_state(self) -> bool:
+        return self.cache_features_var.get()
+
+    def get_force_recalculate_features_checkbox_state(self) -> bool:
+        return self.force_recalculate_features_var.get()

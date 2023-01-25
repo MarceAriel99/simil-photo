@@ -1,6 +1,6 @@
 import numpy as np
 
-class ColorDistributionFeatureExtractor():
+class ColorHistogramFeatureExtractor():
 
     def __init__(self, parameters):
         color_bins = parameters['color_bins'] if 'color_bins' in parameters else 16

@@ -37,11 +37,32 @@ class View(tk.Tk):
 
     # CONFIG PANEL
 
-    def update_folder_path_entry(self, path):
-        self.config_panel.update_folder_path_entry(path)
+    def update_path_entry(self, path):
+        self.config_panel.update_path_entry(path)
 
     def select_folder(self) -> str:
         return self.config_panel.select_folder()
+
+    def set_path_entry_highlight(self, highlight:bool):
+        self.config_panel.set_path_entry_highlight(highlight)
+
+    def get_images_path(self) -> str:
+        return self.config_panel.get_images_path()
+
+    def get_subdirectories_checkbox_state(self) -> bool:
+        return self.config_panel.get_subdirectories_checkbox_state()
+
+    def get_file_types_variables(self) -> dict[str, tk.BooleanVar]:
+        return self.config_panel.get_file_types_variables()
+
+    def get_selected_feature_extraction_method(self) -> str:
+        return self.config_panel.get_selected_feature_extraction_method()
+
+    def get_cache_features_checkbox_state(self) -> bool:
+        return self.config_panel.get_cache_features_checkbox_state()
+
+    def get_force_recalculate_features_checkbox_state(self) -> bool:
+        return self.config_panel.get_force_recalculate_features_checkbox_state()
 
     # IMAGES GRID
 

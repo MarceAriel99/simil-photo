@@ -4,7 +4,7 @@ import numpy as np
 from FilesManagers.config_file_manager import ConfigFileManager
 import FilesManagers.file_searcher as file_searcher
 import FilesManagers.cached_features_file_manager as cached_features_file_manager
-from similarity_calculator import SimilarityCalculator
+from ModelComponents.similarity_calculator import SimilarityCalculator
 
 import numpy as np
 import keras.utils as image

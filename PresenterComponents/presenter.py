@@ -1,5 +1,5 @@
-from model import Model
-from view import View
+from ModelComponents.model import Model
+from ViewComponents.view import View
 
 class Presenter:
     def __init__(self, model: Model, view: View) -> None:

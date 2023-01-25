@@ -3,7 +3,7 @@ from tkinter import filedialog
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image, ImageOps
-from image_square_cropper import crop_square
+from ViewComponents.image_square_cropper import crop_square
 
 class DynamicGrid(tk.Frame):
     def __init__(self, parent, window, *args, **kwargs):

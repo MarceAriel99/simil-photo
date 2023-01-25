@@ -1,6 +1,6 @@
-from model import Model
-from presenter import Presenter
-from view import View
+from ModelComponents.model import Model
+from PresenterComponents.presenter import Presenter
+from ViewComponents.view import View
 
 
 def main() -> None:

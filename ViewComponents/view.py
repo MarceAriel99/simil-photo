@@ -64,6 +64,9 @@ class View(tk.Tk):
     def get_force_recalculate_features_checkbox_state(self) -> bool:
         return self.config_panel.get_force_recalculate_features_checkbox_state()
 
+    def add_message_to_queue(self, message:str):
+        self.config_panel.queue.put(message)
+
     # IMAGES GRID
 
     def load_and_display_images(self, images_paths:list[str]):

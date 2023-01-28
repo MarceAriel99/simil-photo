@@ -1,6 +1,9 @@
+import queue
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
+
+import threading
 
 class ConfigPanel(tk.Frame):
 
@@ -112,12 +115,42 @@ class ConfigPanel(tk.Frame):
         self.run_status_label = tk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
         self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,15))
 
-        self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500)
+        self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1)
         self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(15,15))
 
-        self.run_button = tk.Button(self.run_frame, text="Run")
-        self.run_button.grid(row=2, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
-        self.run_button.bind("<Button-1>", self.presenter.handle_run_button_click)
+        self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
+        self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(15,15))
+
+        self.run_button = tk.Button(self.run_frame, text="Run", command= lambda: threading.Thread(target=self.presenter.handle_run_button_click).start() )
+        self.run_button.grid(row=3, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
+        self.queue = queue.Queue()
+        self.periodic_call()
+        #threading.Thread(target=self.presenter.handle_run_button_click).start()
+        #self.run_button.bind("<Button-1>", self.presenter.handle_run_button_click)
+
+    def periodic_call(self):
+        """ Check every 100 ms if there is something new in the queue. """
+        self.master.after(100, self.periodic_call)
+        self.processIncoming()
+
+    def processIncoming(self):
+        """ Handle all the messages currently in the queue, if any. """
+        while self.queue.qsize():
+            try:
+                msg = self.queue.get(0)
+                # Check contents of message and do what it says
+                # As a test, we simply print it
+                self.update_run_status_label(msg)
+                self.progress_bar.step(16.6)
+                self.progress_bar_ind.start(interval=25)
+                if self.progress_bar['value'] >= 100:
+                    self.progress_bar_ind.stop()
+                
+            except queue.Empty:
+                #print("Queue empty")
+                pass
+
+        #print("Queue empty!")
 
     def _on_feature_extraction_method_selected(self, event):
         method = self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())
@@ -132,6 +165,9 @@ class ConfigPanel(tk.Frame):
     def update_path_entry(self, path):
         self.path_entry.delete(0, tk.END)
         self.path_entry.insert(0, path)
+
+    def update_run_status_label(self, text):
+        self.run_status_label.config(text=text)
 
     def set_path_entry_highlight(self, highlight:bool=True):
         if highlight:

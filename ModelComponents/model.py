@@ -115,6 +115,8 @@ class Model:
         self.images_ids_paths = {}
         self.images_clusters = []
 
+        presenter.add_message_to_queue("SEARCHING FOR IMAGES")
+
         # Search for images in path
         # TODO give option to search in a group of folders
         print(f"Searching for images in {self.images_path} with file types ({self.file_types})")
@@ -129,6 +131,10 @@ class Model:
         for (index, (image_name, image_path)) in enumerate(images_names_paths.items()):
             self.images_ids_paths[index] = f"{image_path}\{image_name}"
 
+        print("Walk completed")
+
+        presenter.add_message_to_queue("LOADING CACHED FEATURES")
+
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
         # TODO Check if the features were calculated with the same parameters, if not, recalculate them
@@ -140,6 +146,8 @@ class Model:
             images_cached_features = {}       
         else:
             images_cached_features = cached_features_file_manager.load_cached_features(self.images_ids_paths, self.cache_file_path)
+
+        presenter.add_message_to_queue("LOADING IMAGES")
             
         # Load images
         # images_pixel_data is a dict with {id: pixel_data} pairs (without precalculated features)
@@ -157,6 +165,8 @@ class Model:
         # Create SimilarityCalculator object
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.feature_extraction_method)
         similarity_calculator.set_feature_extraction_parameters(self.feature_extraction_parameters)
+        
+        presenter.add_message_to_queue("CALCULATING FEATURES AND CLUSTERS")
 
         # Run similarity calculator
         self.images_clusters = similarity_calculator.run()
@@ -164,6 +174,7 @@ class Model:
         # Save features to cache file
         # If at least one image was loaded and the features need to be saved
         if self.save_calculated_features and len(images_pixel_data) > 0:
+            presenter.add_message_to_queue("CACHING FEATURES")
             print("Saving calculated features to cache file")
             self.cached_features_method = self.feature_extraction_method
             images_paths_features:dict[str,np.array] = {}
@@ -175,6 +186,7 @@ class Model:
         # Filter clusters with only one image
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
 
+        presenter.add_message_to_queue("FINISHED")
         presenter.run_completed()
     
     def get_clusters_paths(self) -> list[list[str]]:

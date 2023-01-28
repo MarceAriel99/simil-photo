@@ -90,3 +90,6 @@ class Presenter:
 
         self.view.update_status_label("Running...")
         self.model.run(self)
+
+    def add_message_to_queue(self, message: str) -> None:
+        self.view.add_message_to_queue(message)

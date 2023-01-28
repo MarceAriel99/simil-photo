@@ -2,7 +2,6 @@ import csv
 import os
 import numpy as np
 
-# TODO: Make 'TEMP.csv' a constant
 TEMP_FILE_NAME = 'TEMP.csv'
 
 def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int, np.array]:
@@ -16,7 +15,7 @@ def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int
                 image_path = row[0]
                 if image_path not in images_ids_paths.values():
                     continue
-                image_features = np.array(row[1:])
+                image_features = np.array([float(x) for x in row[1:]])
                 image_id = list(images_ids_paths.keys())[list(images_ids_paths.values()).index(image_path)]
                 cached_features[image_id] = image_features
     except FileNotFoundError:

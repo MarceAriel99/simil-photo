@@ -81,6 +81,9 @@ class Model:
     def set_feature_extraction_method(self, feature_extraction_method:str, parameters:dict[str,any]={}):
         self.feature_extraction_method = feature_extraction_method
         self._set_feature_extraction_parameters(parameters)
+
+    def get_feature_extraction_method(self) -> str:
+        return self.feature_extraction_method
     
     def set_clustering_method(self, clustering_method:str):
         self.clustering_method = clustering_method
@@ -150,7 +153,7 @@ class Model:
         presenter.add_message_to_queue("LOADING IMAGES")
             
         # Load images
-        # images_pixel_data is a dict with {id: pixel_data} pairs (without precalculated features)
+        # images_pixel_data is a dict with {id: pixel_data} pairs (without cached features)
         images_pixel_data = {} 
         for (image_id, image_path) in self.images_ids_paths.items():
             if image_id in images_cached_features:
@@ -167,9 +170,10 @@ class Model:
         similarity_calculator.set_feature_extraction_parameters(self.feature_extraction_parameters)
         
         presenter.add_message_to_queue("CALCULATING FEATURES AND CLUSTERS")
-
         # Run similarity calculator
+        # TODO: Send a callback to the similarity calculator to update the progress bar
         self.images_clusters = similarity_calculator.run()
+        
 
         # Save features to cache file
         # If at least one image was loaded and the features need to be saved

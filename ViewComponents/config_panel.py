@@ -86,8 +86,8 @@ class ConfigPanel(tk.Frame):
         self.feature_extraction_listbox = tk.Listbox(self.feature_extraction_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6)
         self.feature_extraction_listbox.bind('<<ListboxSelect>>', self._on_feature_extraction_method_selected)
         self.feature_extraction_textbox = tk.Text(self.feature_extraction_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD)
-        self.feature_extraction_listbox.select_set(0)
-        self._on_feature_extraction_method_selected(None)
+        #self.feature_extraction_listbox.select_set(0)
+        #self._on_feature_extraction_method_selected(None)
 
         self.feature_cache_recalculate_frame = tk.Frame(self.feature_extraction_frame)
 
@@ -152,6 +152,10 @@ class ConfigPanel(tk.Frame):
 
         #print("Queue empty!")
 
+    def select_feature_extraction_method(self, method):
+        self.feature_extraction_listbox.select_set(method)
+        self._on_feature_extraction_method_selected(None)
+
     def _on_feature_extraction_method_selected(self, event):
         method = self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())
         self.update_feature_extraction_textbox(method + " TODO GET THIS FROM SOMEWHERE")
@@ -194,8 +198,8 @@ class ConfigPanel(tk.Frame):
         return self.file_types_variables
 
     def get_selected_feature_extraction_method(self) -> str:
-        print(self.feature_extraction_listbox.get(tk.ACTIVE))
-        return self.feature_extraction_listbox.get(tk.ACTIVE)
+        print(self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection()))
+        return self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())
 
     def get_cache_features_checkbox_state(self) -> bool:
         return self.cache_features_var.get()

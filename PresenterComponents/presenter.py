@@ -22,6 +22,9 @@ class Presenter:
         self.view.config_panel.jpeg_checkbox.select() if ".jpeg" in self.model.get_file_types() else self.view.config_panel.jpeg_checkbox.deselect()
         self.view.config_panel.webp_checkbox.select() if ".webp" in self.model.get_file_types() else self.view.config_panel.webp_checkbox.deselect()
 
+        # TODO make this scalable and not hardcoded
+        items = ['vgg16', 'mobilenet', 'color_histogram']
+        self.view.config_panel.select_feature_extraction_method(items.index(self.model.get_feature_extraction_method()))
         self.view.config_panel.cache_features_checkbox.select() if self.model.get_save_calculated_features() else self.view.config_panel.cache_features_checkbox.deselect()
         self.view.config_panel.force_recalculate_features_checkbox.select() if self.model.get_force_recalculate_features() else self.view.config_panel.force_recalculate_features_checkbox.deselect()
         

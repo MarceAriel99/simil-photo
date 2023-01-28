@@ -95,7 +95,7 @@ class SimilarityCalculator():
             features_array[id] = features
 
         return cosine_similarity(np.array(features_array))
-
+        
     def _calculate_clusters(self, similarity_matrix: np.ndarray) -> list[list[int]]:
 
         if self.clustering_method != 'affinity_propagation':

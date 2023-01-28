@@ -21,7 +21,7 @@ class View(tk.Tk):
         self.main_frame = tk.Frame(self, padx=10, pady=10)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.top_bar = TopBar(self.main_frame, self, presenter)
+        self.top_bar = TopBar(self.main_frame, self, presenter, padx=10, pady=10)
         self.images_grid = DynamicGrid(self.main_frame, self, padx=10, pady=10)
         self.config_panel = ConfigPanel(self.main_frame, self, presenter)
 

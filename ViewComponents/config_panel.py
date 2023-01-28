@@ -16,18 +16,16 @@ class ConfigPanel(tk.Frame):
         self.file_search_frame = tk.Frame(self)
         self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=10)
         ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=10)
-        self.features_frame = tk.Frame(self)
-        self.features_frame.grid(row=3, column=0, sticky="nsew", pady=10)
-        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=10)
         self.feature_extraction_frame = tk.Frame(self)
-        self.feature_extraction_frame.grid(row=5, column=0, sticky="nsew", pady=10)
+        self.feature_extraction_frame.grid(row=3, column=0, sticky="nsew", pady=10)
+        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=10)
+        self.run_frame = tk.Frame(self)
+        self.run_frame.grid(row=5, column=0, sticky="nsew", pady=10)
+
 
         self._create_file_search_submenu(presenter)
         self._create_feature_extraction_submenu(presenter)
-        
-        self.run_button = tk.Button(self, text="RUN", width=6, pady=5)
-        self.run_button.grid(row=6, column=0, sticky="sew")
-        self.run_button.bind("<Button-1>", self.presenter.handle_run_button_click)
+        self._create_run_submenu(presenter)
 
     def _create_file_search_submenu(self, presenter):
 
@@ -76,19 +74,19 @@ class ConfigPanel(tk.Frame):
 
     def _create_feature_extraction_submenu(self, presenter):
 
-        self.feature_extraction_title_label = tk.Label(self.features_frame, text="Feature extraction", font=("Arial", 15, 'bold', 'underline'))
+        self.feature_extraction_title_label = tk.Label(self.feature_extraction_frame, text="Feature extraction", font=("Arial", 15, 'bold', 'underline'))
 
-        self.feature_extraction_method_label = tk.Label(self.features_frame, text="Feature extraction method:")
+        self.feature_extraction_method_label = tk.Label(self.feature_extraction_frame, text="Feature extraction method:")
 
         items = ['vgg16', 'mobilenet', 'color_histogram'] # TODO This item list should be connected with the switch in the model
         list_items = tk.Variable(value=items)
-        self.feature_extraction_listbox = tk.Listbox(self.features_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6)
+        self.feature_extraction_listbox = tk.Listbox(self.feature_extraction_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6)
         self.feature_extraction_listbox.bind('<<ListboxSelect>>', self._on_feature_extraction_method_selected)
-        self.feature_extraction_textbox = tk.Text(self.features_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD)
+        self.feature_extraction_textbox = tk.Text(self.feature_extraction_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD)
         self.feature_extraction_listbox.select_set(0)
         self._on_feature_extraction_method_selected(None)
 
-        self.feature_cache_recalculate_frame = tk.Frame(self.features_frame)
+        self.feature_cache_recalculate_frame = tk.Frame(self.feature_extraction_frame)
 
         self.cache_features_label = tk.Label(self.feature_cache_recalculate_frame, text="Cache image features")
         self.cache_features_var = tk.BooleanVar()
@@ -108,6 +106,18 @@ class ConfigPanel(tk.Frame):
         self.force_recalculate_features_label.pack(side=tk.LEFT, padx=(20,0))
         self.force_recalculate_features_checkbox.pack(side=tk.LEFT)
         self.feature_cache_recalculate_frame.grid(row=3, column=0, columnspan=4, sticky=tk.W)
+
+    def _create_run_submenu(self, presenter):
+        
+        self.run_status_label = tk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
+        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,15))
+
+        self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500)
+        self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(15,15))
+
+        self.run_button = tk.Button(self.run_frame, text="Run")
+        self.run_button.grid(row=2, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
+        self.run_button.bind("<Button-1>", self.presenter.handle_run_button_click)
 
     def _on_feature_extraction_method_selected(self, event):
         method = self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())

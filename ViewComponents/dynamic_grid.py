@@ -3,7 +3,6 @@ from PIL import ImageTk, Image, ImageOps
 
 from ViewComponents.image_square_cropper import crop_square
 
-
 class DynamicGrid(tk.Frame):
     def __init__(self, parent, window, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -18,7 +17,7 @@ class DynamicGrid(tk.Frame):
         img = Image.open(image_path)
         img = ImageOps.exif_transpose(img)
         img = crop_square(img)
-        img = img.resize((100, 100))
+        img = img.resize((150, 150))
         img = ImageTk.PhotoImage(img)
 
         self.images.append(img)

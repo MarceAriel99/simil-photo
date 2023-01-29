@@ -1,6 +1,7 @@
 import os
-from ModelComponents.model import Model
-from ViewComponents.view import View
+from model_components.model import Model
+from view_components.view import View
+from steps import Steps
 
 class Presenter:
     def __init__(self, model: Model, view: View) -> None:
@@ -47,6 +48,9 @@ class Presenter:
         self.clusters = self.model.get_clusters_paths()
         self.view.update_status_label(f"{len(self.clusters)} Groups found!")
         self.view.empty_grid()
+
+        self.add_message_to_queue(("STARTED_STEP", "Done!"))
+        self.add_message_to_queue(("COMPLETED_STEP", 100))
         
         if len(self.clusters) == 0:
             self.view.change_group_frame_visibility(False)
@@ -56,6 +60,36 @@ class Presenter:
         self.view.update_current_group_label(self.current_cluster, len(self.clusters))
         self.view.load_and_display_images(self.clusters[self.current_cluster])
         self.model.update_config_file()
+
+    def step_started(self, step: Steps) -> None:
+
+        if step == Steps.search_images:
+            self.add_message_to_queue(("STARTED_STEP", "Searching images..."))
+        elif step == Steps.load_cached_features:
+            self.add_message_to_queue(("STARTED_STEP", "Loading cached features..."))
+        elif step == Steps.load_images:
+            self.add_message_to_queue(("STARTED_STEP", "Loading images..."))
+        elif step == Steps.calculate_features:
+            self.add_message_to_queue(("STARTED_STEP", "Calculating features..."))
+        elif step == Steps.calculate_clusters:
+            self.add_message_to_queue(("STARTED_STEP", "Calculating clusters..."))
+        elif step == Steps.cache_features:
+            self.add_message_to_queue(("STARTED_STEP", "Caching features..."))
+
+    def step_completed(self, step: Steps) -> None:
+        
+        if step == Steps.search_images:
+            self.add_message_to_queue(("COMPLETED_STEP", 5))
+        elif step == Steps.load_cached_features:
+            self.add_message_to_queue(("COMPLETED_STEP", 20))
+        elif step == Steps.load_images:
+            self.add_message_to_queue(("COMPLETED_STEP", 40))
+        elif step == Steps.calculate_features:
+            self.add_message_to_queue(("COMPLETED_STEP", 70))
+        elif step == Steps.calculate_clusters:
+            self.add_message_to_queue(("COMPLETED_STEP", 80))
+        elif step == Steps.cache_features:
+            self.add_message_to_queue(("COMPLETED_STEP", 95))
 
     def handle_next_group_button_click(self, event=None) -> None:
         if self.current_cluster < len(self.clusters) - 1:
@@ -91,8 +125,9 @@ class Presenter:
 
         self._apply_config_to_model() 
 
-        self.view.update_status_label("Running...")
+        self.view.config_panel.progress_bar["value"] = 0
+
         self.model.run(self)
 
-    def add_message_to_queue(self, message: str) -> None:
+    def add_message_to_queue(self, message: Steps) -> None:
         self.view.add_message_to_queue(message)

@@ -7,9 +7,9 @@ from keras.applications.vgg16 import preprocess_input
 from sklearn.cluster import AffinityPropagation
 from sklearn.metrics.pairwise import cosine_similarity
 
-from FeatureExtractors.color_histogram_extractor import ColorHistogramFeatureExtractor
-from FeatureExtractors.vgg16_extractor import VGG16FeatureExtractor
-from FeatureExtractors.mobilenet_extractor import MobileNetFeatureExtractor
+from feature_extractors.color_histogram_extractor import ColorHistogramFeatureExtractor
+from feature_extractors.vgg16_extractor import VGG16FeatureExtractor
+from feature_extractors.mobilenet_extractor import MobileNetFeatureExtractor
 
 class SimilarityCalculator():
 
@@ -26,6 +26,8 @@ class SimilarityCalculator():
 
         self.image_clusters = None # List of lists with id's of similar images ordered by similarity
 
+        self.similarity_matrix = None # Matrix with similarity values between images
+
     def set_feature_extraction_method(self, feature_extraction_method: str, parameters: dict=None) -> None:
         self.feature_extraction_method = feature_extraction_method
         self.set_feature_extraction_parameters(parameters)
@@ -39,8 +41,8 @@ class SimilarityCalculator():
     def get_normalized_features(self) -> dict[int, np.ndarray]:
         return self.image_features
 
-    def run(self) -> list[list[int]]: # Each list inside contains a group of id's of similar images ordered by similarity
-        
+    def run_feature_calculation(self) -> None:
+                
         # Extract features
         extracted_features = self._extract_features(self.images_pixel_data)
 
@@ -48,12 +50,14 @@ class SimilarityCalculator():
         self.image_features.update(self._normalize_features(extracted_features))
 
         # Calculate similarity matrix
-        similarity_matrix = self._calculate_similarity_matrix(self.image_features)
+        self.similarity_matrix = self._calculate_similarity_matrix(self.image_features)
 
         #TODO: Reduce dimensionality of features
 
+    def run_cluster_calculation(self) -> list[list[int]]: # Each list inside contains a group of id's of similar images ordered by similarity
+
         # Calculate clusters
-        self.image_clusters = self._calculate_clusters(similarity_matrix)
+        self.image_clusters = self._calculate_clusters(self.similarity_matrix)
 
         return self.image_clusters
     

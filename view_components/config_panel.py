@@ -108,25 +108,23 @@ class ConfigPanel(tk.Frame):
         self.cache_features_checkbox.pack(side=tk.LEFT)
         self.force_recalculate_features_label.pack(side=tk.LEFT, padx=(20,0))
         self.force_recalculate_features_checkbox.pack(side=tk.LEFT)
-        self.feature_cache_recalculate_frame.grid(row=3, column=0, columnspan=4, sticky=tk.W)
+        self.feature_cache_recalculate_frame.grid(row=3, column=0, columnspan=4, sticky=tk.W, pady=(15,0))
 
     def _create_run_submenu(self, presenter):
         
         self.run_status_label = tk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
-        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,15))
+        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10))
 
         self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1)
-        self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(15,15))
+        self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
 
         self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
-        self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(15,15))
+        self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
 
         self.run_button = tk.Button(self.run_frame, text="Run", command= lambda: threading.Thread(target=self.presenter.handle_run_button_click).start() )
         self.run_button.grid(row=3, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
         self.queue = queue.Queue()
         self.periodic_call()
-        #threading.Thread(target=self.presenter.handle_run_button_click).start()
-        #self.run_button.bind("<Button-1>", self.presenter.handle_run_button_click)
 
     def periodic_call(self):
         """ Check every 100 ms if there is something new in the queue. """
@@ -140,9 +138,13 @@ class ConfigPanel(tk.Frame):
                 msg = self.queue.get(0)
                 # Check contents of message and do what it says
                 # As a test, we simply print it
-                self.update_run_status_label(msg)
-                self.progress_bar.step(16.6)
+                if msg[0] == "STARTED_STEP":
+                    self.update_run_status_label(msg[1])
+                elif msg[0] == "COMPLETED_STEP":
+                    self.progress_bar['value'] = msg[1]
+
                 self.progress_bar_ind.start(interval=25)
+
                 if self.progress_bar['value'] >= 100:
                     self.progress_bar_ind.stop()
                 

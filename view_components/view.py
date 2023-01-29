@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 
-from ViewComponents.dynamic_grid import DynamicGrid
-from ViewComponents.config_panel import ConfigPanel
-from ViewComponents.top_bar import TopBar
+from view_components.dynamic_grid import DynamicGrid
+from view_components.config_panel import ConfigPanel
+from view_components.top_bar import TopBar
   
 class View(tk.Tk):
 
@@ -13,7 +13,7 @@ class View(tk.Tk):
         print("View created")
         super().__init__()
         self.title('SimilPhoto')
-        self.minsize(width=800, height=600)
+        self.minsize(width=800, height=680)
         self.geometry('1400x680')
 
     def init_ui(self, presenter):

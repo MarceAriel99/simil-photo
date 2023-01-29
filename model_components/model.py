@@ -1,14 +1,16 @@
 import sys
 
 import numpy as np
-from FilesManagers.config_file_manager import ConfigFileManager
-import FilesManagers.file_searcher as file_searcher
-import FilesManagers.cached_features_file_manager as cached_features_file_manager
-from ModelComponents.similarity_calculator import SimilarityCalculator
+from file_managers.config_file_manager import ConfigFileManager
+import file_managers.file_searcher as file_searcher
+import file_managers.cached_features_file_manager as cached_features_file_manager
+from model_components.similarity_calculator import SimilarityCalculator
 
 import numpy as np
 import keras.utils as image
 import cv2
+
+from steps import Steps
 
 # TODO: add constants for the config file parameters
 # TODO: add exception checks everywhere
@@ -118,7 +120,7 @@ class Model:
         self.images_ids_paths = {}
         self.images_clusters = []
 
-        presenter.add_message_to_queue("SEARCHING FOR IMAGES")
+        presenter.step_started(Steps.search_images)
 
         # Search for images in path
         # TODO give option to search in a group of folders
@@ -136,7 +138,7 @@ class Model:
 
         print("Walk completed")
 
-        presenter.add_message_to_queue("LOADING CACHED FEATURES")
+        presenter.step_completed(Steps.search_images)
 
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
@@ -148,12 +150,15 @@ class Model:
             print("Forcing recalculation of features")
             images_cached_features = {}       
         else:
+            presenter.step_started(Steps.load_cached_features)
             images_cached_features = cached_features_file_manager.load_cached_features(self.images_ids_paths, self.cache_file_path)
+            presenter.step_completed(Steps.load_cached_features)
 
-        presenter.add_message_to_queue("LOADING IMAGES")
-            
+        
         # Load images
         # images_pixel_data is a dict with {id: pixel_data} pairs (without cached features)
+        presenter.step_started(Steps.load_images)
+
         images_pixel_data = {} 
         for (image_id, image_path) in self.images_ids_paths.items():
             if image_id in images_cached_features:
@@ -162,35 +167,39 @@ class Model:
             img_data = image.img_to_array(img)
             images_pixel_data[image_id] = img_data
 
+        presenter.step_completed(Steps.load_images)
+
         print(f"{len(images_pixel_data)} images loaded")
         print(f"{len(images_cached_features)} images did not need to be loaded")
-        
+
         # Create SimilarityCalculator object
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.feature_extraction_method)
         similarity_calculator.set_feature_extraction_parameters(self.feature_extraction_parameters)
         
-        presenter.add_message_to_queue("CALCULATING FEATURES AND CLUSTERS")
         # Run similarity calculator
-        # TODO: Send a callback to the similarity calculator to update the progress bar
-        self.images_clusters = similarity_calculator.run()
-        
+        presenter.step_started(Steps.calculate_features)
+        similarity_calculator.run_feature_calculation()
+        presenter.step_completed(Steps.calculate_features)
 
+        presenter.step_started(Steps.calculate_clusters)
+        self.images_clusters = similarity_calculator.run_cluster_calculation()
+        presenter.step_completed(Steps.calculate_clusters)
+        
         # Save features to cache file
         # If at least one image was loaded and the features need to be saved
         if self.save_calculated_features and len(images_pixel_data) > 0:
-            presenter.add_message_to_queue("CACHING FEATURES")
             print("Saving calculated features to cache file")
+            presenter.step_started(Steps.cache_features)
             self.cached_features_method = self.feature_extraction_method
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features
             
             cached_features_file_manager.save_cached_features(images_paths_features, self.cache_file_path, feature_extraction_method_changed)
+            presenter.step_completed(Steps.cache_features)
 
         # Filter clusters with only one image
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
-
-        presenter.add_message_to_queue("FINISHED")
         presenter.run_completed()
     
     def get_clusters_paths(self) -> list[list[str]]:

@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import ImageTk, Image, ImageOps
 
-from ViewComponents.image_square_cropper import crop_square
+from view_components.image_square_cropper import crop_square
 
 class DynamicGrid(tk.Frame):
     def __init__(self, parent, window, *args, **kwargs):

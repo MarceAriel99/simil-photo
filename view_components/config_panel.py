@@ -1,3 +1,4 @@
+import os
 import queue
 import tkinter as tk
 from tkinter import ttk
@@ -86,8 +87,6 @@ class ConfigPanel(tk.Frame):
         self.feature_extraction_listbox = tk.Listbox(self.feature_extraction_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6)
         self.feature_extraction_listbox.bind('<<ListboxSelect>>', self._on_feature_extraction_method_selected)
         self.feature_extraction_textbox = tk.Text(self.feature_extraction_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD)
-        #self.feature_extraction_listbox.select_set(0)
-        #self._on_feature_extraction_method_selected(None)
 
         self.feature_cache_recalculate_frame = tk.Frame(self.feature_extraction_frame)
 
@@ -137,7 +136,6 @@ class ConfigPanel(tk.Frame):
             try:
                 msg = self.queue.get(0)
                 # Check contents of message and do what it says
-                # As a test, we simply print it
                 if msg[0] == "STARTED_STEP":
                     self.update_run_status_label(msg[1])
                 elif msg[0] == "COMPLETED_STEP":
@@ -149,10 +147,7 @@ class ConfigPanel(tk.Frame):
                     self.progress_bar_ind.stop()
                 
             except queue.Empty:
-                #print("Queue empty")
                 pass
-
-        #print("Queue empty!")
 
     def select_feature_extraction_method(self, method):
         self.feature_extraction_listbox.select_set(method)
@@ -182,9 +177,9 @@ class ConfigPanel(tk.Frame):
             self.path_entry.config(highlightthickness=0)
 
     def select_folder(self) -> str:
-        folder_path = filedialog.askdirectory()
+        folder_path = os.path.normpath(filedialog.askdirectory())
 
-        if folder_path != "":
+        if folder_path != "" and folder_path != ".":
             self.path_entry.delete(0, tk.END)
             self.path_entry.insert(0, folder_path)
         

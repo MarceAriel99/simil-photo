@@ -9,7 +9,7 @@ class TopBar(tk.Frame):
         self._initialize(presenter)
         
     def _initialize(self, presenter):
-        self.status_label = tk.Label(self, text="")
+        self.status_label = tk.Label(self, text="", font=('TkDefaultFont', 16, "bold"))
         self.status_label.pack(side=tk.LEFT)
 
         self.group_frame = tk.Frame(self)

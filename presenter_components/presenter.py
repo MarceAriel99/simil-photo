@@ -1,4 +1,6 @@
 import os
+
+import PIL
 from model_components.model import Model
 from view_components.view import View
 
@@ -136,7 +138,16 @@ class Presenter:
     def handle_delete_button_click(self, path: str) -> None:
         # Should be done by model?
         print("Deleting", path)
+        try:
+            os.remove(path)
+            self.clusters[self.current_cluster].remove(path) # Remove from current cluster so it doesn't get displayed again
+        except Exception as e:
+            print(e)
 
     def handle_open_button_click(self, path: str) -> None:
         # Should be done by model?
         print("Opening", path)
+        try:
+            os.startfile(path)
+        except Exception as e:
+            print(e)

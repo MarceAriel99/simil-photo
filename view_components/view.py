@@ -13,7 +13,7 @@ class View(tk.Tk):
         print("View created")
         super().__init__()
         self.title('SimilPhoto')
-        self.minsize(width=800, height=680)
+        self.minsize(width=800, height=730)
         self.geometry('1600x680')
 
     def init_ui(self, presenter):
@@ -72,10 +72,10 @@ class View(tk.Tk):
     def load_and_display_images(self, images_paths:list[str]):
         self.empty_grid()
         for image_path in images_paths:
-            self.images_grid.add_box(image_path)
+            self.images_grid.add_image(image_path)
 
     def empty_grid(self):
-        self.images_grid.delete_all_boxes()
+        self.images_grid.delete_all_images()
 
     # TOP BAR
 

@@ -14,7 +14,7 @@ class View(tk.Tk):
         super().__init__()
         self.title('SimilPhoto')
         self.minsize(width=800, height=680)
-        self.geometry('1400x680')
+        self.geometry('1600x680')
 
     def init_ui(self, presenter):
         print("Initializing UI")
@@ -22,7 +22,7 @@ class View(tk.Tk):
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
         self.top_bar = TopBar(self.main_frame, self, presenter, padx=10, pady=10)
-        self.images_grid = DynamicGrid(self.main_frame, self, padx=10, pady=10)
+        self.images_grid = DynamicGrid(self.main_frame, self, presenter, padx=10, pady=10)
         self.config_panel = ConfigPanel(self.main_frame, self, presenter)
 
         self.main_frame.grid_columnconfigure(0, weight=1)

@@ -1,6 +1,7 @@
 import os
 from model_components.model import Model
 from view_components.view import View
+
 from steps import Steps
 
 class Presenter:
@@ -131,3 +132,11 @@ class Presenter:
 
     def add_message_to_queue(self, message: Steps) -> None:
         self.view.add_message_to_queue(message)
+
+    def handle_delete_button_click(self, path: str) -> None:
+        # Should be done by model?
+        print("Deleting", path)
+
+    def handle_open_button_click(self, path: str) -> None:
+        # Should be done by model?
+        print("Opening", path)

@@ -134,7 +134,7 @@ class Model:
 
         # Create dictionary
         for (index, (image_name, image_path)) in enumerate(images_names_paths.items()):
-            self.images_ids_paths[index] = f"{image_path}\{image_name}"
+            self.images_ids_paths[index] = f"{image_path}\\{image_name}"
 
         print("Walk completed")
 

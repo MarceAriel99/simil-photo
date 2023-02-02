@@ -10,7 +10,8 @@ def file_search(root_directory:str, extensions:tuple[str], search_subdirectories
     result = {}
 
     for (root,dirs,files) in os.walk(root_directory, topdown=True):
-        #print(f"Root: {root}")
+        root = os.path.normpath(root)
+        print(f"Root: {root}")
         #print(f"Dirs: {dirs}")
         #print(f"Files: {files}")
         if not search_subdirectories and root != root_directory:

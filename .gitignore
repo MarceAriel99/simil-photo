@@ -1,3 +1,10 @@
 **/__pycache__
 cached_features.csv
 config.ini
+
+# Python Virtual environment
+/venv
+
+# Result files of pyinstaller
+/build
+/dist

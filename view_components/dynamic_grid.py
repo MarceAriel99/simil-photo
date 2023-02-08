@@ -8,7 +8,7 @@ class DynamicGrid(tk.Frame):
 
     def __init__(self, parent, window, presenter, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        self.text = tk.Text(self, wrap="char", borderwidth=0, highlightthickness=0, state="disabled")
+        self.text = tk.Text(self, wrap="char", borderwidth=0, highlightthickness=0, state="disabled", cursor="arrow")
         self.text.pack(fill="both", expand=True)
         self.images = []
         self.window = window

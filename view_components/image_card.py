@@ -18,7 +18,6 @@ class ImageCard(tk.Frame):
     def _initialize(self, presenter):
         
         # Title
-        # TODO check title length
         self.title_label = tk.Label(self)
 
         title = self.path.split("\\")[-1]

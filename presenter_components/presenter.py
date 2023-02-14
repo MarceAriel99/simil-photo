@@ -1,6 +1,5 @@
 import os
 
-import PIL
 from model_components.model import Model
 from view_components.view import View
 
@@ -20,12 +19,15 @@ class Presenter:
         self.view.update_path_entry(folder_path_entry)
         # TODO should access through a method to change the state of the checkbox
         self.view.config_panel.subdirectories_checkbox.select() if self.model.get_check_subdirectories() else self.view.config_panel.subdirectories_checkbox.deselect()
-        # TODO make this scalable and not hardcoded
-        self.view.config_panel.jpg_checkbox.select() if ".jpg" in self.model.get_file_types() else self.view.config_panel.jpg_checkbox.deselect()
-        self.view.config_panel.png_checkbox.select() if ".png" in self.model.get_file_types() else self.view.config_panel.png_checkbox.deselect()
-        self.view.config_panel.jpeg_checkbox.select() if ".jpeg" in self.model.get_file_types() else self.view.config_panel.jpeg_checkbox.deselect()
-        self.view.config_panel.webp_checkbox.select() if ".webp" in self.model.get_file_types() else self.view.config_panel.webp_checkbox.deselect()
 
+        # Update file types checkboxes
+        for file_type in self.model.get_all_file_types():
+            if file_type in self.model.get_selected_file_types():
+                self.view.config_panel.file_types_variables[file_type[1:]].set(True)
+            else:
+                self.view.config_panel.file_types_variables[file_type[1:]].set(False)
+
+        # Update feature extraction method selection
         # TODO make this scalable and not hardcoded
         items = ['vgg16', 'mobilenet', 'color_histogram']
         self.view.config_panel.select_feature_extraction_method(items.index(self.model.get_feature_extraction_method()))

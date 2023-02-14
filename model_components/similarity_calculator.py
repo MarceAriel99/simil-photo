@@ -105,7 +105,6 @@ class SimilarityCalculator():
         if self.clustering_method != 'affinity_propagation':
             raise Exception(f"Clustering method '{self.clustering_method}' not implemented")
 
-        #TODO: Give the option to use different parameters
         affprop = AffinityPropagation(affinity="precomputed", damping=0.5, max_iter=350 , preference= 0.5).fit(similarity_matrix)
 
         clusters = [[] for _ in range(max(affprop.labels_) + 1)]

@@ -28,7 +28,7 @@ class Model:
         self.check_subdirectories:bool = True
         self.cache_file_path:str = DEFAULT_CACHE_FILE_PATH
         self.feature_extraction_method:str = 'vgg16'
-        self.file_types:list[str] = ['.jpg', '.jpeg', '.png']
+        self.selected_file_types:list[str] = ['.jpg', '.jpeg', '.png']
         self.clustering_method:str = 'affinity_propagation'
         self.feature_extraction_parameters:dict[str,any] = {}
         self.similarity_calculator:SimilarityCalculator = None
@@ -52,7 +52,8 @@ class Model:
         self.cache_file_path = cache_file_path_in_file if cache_file_path_in_file != '' else self.cache_file_path
 
         self.feature_extraction_method = self.configFileManager.get_config_parameter('feature_extraction', 'method')
-        self.file_types = self.configFileManager.get_config_parameter('file_types', 'supported').split(',')
+        self.selected_file_types = self.configFileManager.get_config_parameter('file_types', 'selected').split(',')
+        self.all_file_types = self.configFileManager.get_config_parameter('file_types', 'supported').split(',')
         self.clustering_method = self.configFileManager.get_config_parameter('clustering', 'method')
         self.force_recalculate_features = True if self.configFileManager.get_config_parameter('cache', 'force_recalculate_features') == 'True' else False
         self.save_calculated_features = True if self.configFileManager.get_config_parameter('cache', 'save_calculated_features') == 'True' else False
@@ -63,7 +64,7 @@ class Model:
         config_parameters = {}
         config_parameters['paths'] = {'images_path': self.images_path, 'cache_file_path': self.cache_file_path}
         config_parameters['misc'] = {'check_subdirectories': str(self.check_subdirectories)}
-        config_parameters['file_types'] = {'supported': ','.join(self.file_types)}
+        config_parameters['file_types'] = {'selected': ','.join(self.selected_file_types)}
         config_parameters['feature_extraction'] = {'method': self.feature_extraction_method}
         config_parameters['clustering'] = {'method': self.clustering_method}
         config_parameters['cache'] = {'force_recalculate_features': str(self.force_recalculate_features), 
@@ -75,10 +76,13 @@ class Model:
         self.feature_extraction_parameters = parameters
 
     def set_file_types(self, file_types:list[str]):
-        self.file_types = file_types
+        self.selected_file_types = file_types
 
-    def get_file_types(self) -> list[str]:
-        return self.file_types
+    def get_selected_file_types(self) -> list[str]:
+        return self.selected_file_types
+    
+    def get_all_file_types(self) -> list[str]:
+        return self.all_file_types
 
     def set_feature_extraction_method(self, feature_extraction_method:str, parameters:dict[str,any]={}):
         self.feature_extraction_method = feature_extraction_method
@@ -124,11 +128,11 @@ class Model:
 
         # Search for images in path
         # TODO give option to search in a group of folders
-        print(f"Searching for images in {self.images_path} with file types ({self.file_types})")
-        images_names_paths = file_searcher.file_search(self.images_path, tuple(self.file_types), self.check_subdirectories)
+        print(f"Searching for images in {self.images_path} with file types ({self.selected_file_types})")
+        images_names_paths = file_searcher.file_search(self.images_path, tuple(self.selected_file_types), self.check_subdirectories)
 
         if len(images_names_paths) == 0:
-            print(f"No images found in the specified path with file types ({self.file_types})")
+            print(f"No images found in the specified path with file types ({self.selected_file_types})")
             presenter.run_completed()
             return
 

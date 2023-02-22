@@ -16,7 +16,7 @@ class ColorHistogramFeatureExtractor():
         
     # Calculates the signature of an image by using color distribution
     # Separates each color in a number of bins
-    def _calculate_features_of_image(self, img, color_bins): #TODO Optimize with numpy?
+    def _calculate_features_of_image(self, img, color_bins): #POSSIBLE_UPGRADE: Optimize speed with numpy (If possible)
 
         signature_length = color_bins**3 # The signature will have a length of color_bins^3
         signature = [0] * signature_length # The signature is a vector representing color distribution

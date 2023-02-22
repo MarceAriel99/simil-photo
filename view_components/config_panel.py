@@ -82,8 +82,8 @@ class ConfigPanel(tk.Frame):
 
         self.feature_extraction_method_label = tk.Label(self.feature_extraction_frame, text="Feature extraction method:")
 
-        items = ['vgg16', 'mobilenet', 'color_histogram'] # TODO This item list should be connected with the switch in the model
-        list_items = tk.Variable(value=items)
+        feature_extraction_methods = self.presenter.get_feature_extraction_methods()
+        list_items = tk.Variable(value=feature_extraction_methods)
         self.feature_extraction_listbox = tk.Listbox(self.feature_extraction_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6)
         self.feature_extraction_listbox.bind('<<ListboxSelect>>', self._on_feature_extraction_method_selected)
         self.feature_extraction_textbox = tk.Text(self.feature_extraction_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD)

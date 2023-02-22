@@ -27,7 +27,7 @@ class Model:
         self.images_path:str = ''
         self.check_subdirectories:bool = True
         self.cache_file_path:str = DEFAULT_CACHE_FILE_PATH
-        self.feature_extraction_method:str = 'vgg16'
+        self.selected_feature_extraction_method:str = 'vgg16'
         self.selected_file_types:list[str] = ['.jpg', '.jpeg', '.png']
         self.clustering_method:str = 'affinity_propagation'
         self.feature_extraction_parameters:dict[str,any] = {}
@@ -51,7 +51,8 @@ class Model:
         cache_file_path_in_file = self.configFileManager.get_config_parameter('paths', 'cache_file_path')
         self.cache_file_path = cache_file_path_in_file if cache_file_path_in_file != '' else self.cache_file_path
 
-        self.feature_extraction_method = self.configFileManager.get_config_parameter('feature_extraction', 'method')
+        self.selected_feature_extraction_method = self.configFileManager.get_config_parameter('feature_extraction', 'selected')
+        self.all_feature_extraction_methods = self.configFileManager.get_config_parameter('feature_extraction', 'supported').split(',')
         self.selected_file_types = self.configFileManager.get_config_parameter('file_types', 'selected').split(',')
         self.all_file_types = self.configFileManager.get_config_parameter('file_types', 'supported').split(',')
         self.clustering_method = self.configFileManager.get_config_parameter('clustering', 'method')
@@ -65,7 +66,7 @@ class Model:
         config_parameters['paths'] = {'images_path': self.images_path, 'cache_file_path': self.cache_file_path}
         config_parameters['misc'] = {'check_subdirectories': str(self.check_subdirectories)}
         config_parameters['file_types'] = {'selected': ','.join(self.selected_file_types)}
-        config_parameters['feature_extraction'] = {'method': self.feature_extraction_method}
+        config_parameters['feature_extraction'] = {'selected': self.selected_feature_extraction_method}
         config_parameters['clustering'] = {'method': self.clustering_method}
         config_parameters['cache'] = {'force_recalculate_features': str(self.force_recalculate_features), 
         'save_calculated_features': str(self.save_calculated_features), 
@@ -85,11 +86,14 @@ class Model:
         return self.all_file_types
 
     def set_feature_extraction_method(self, feature_extraction_method:str, parameters:dict[str,any]={}):
-        self.feature_extraction_method = feature_extraction_method
+        self.selected_feature_extraction_method = feature_extraction_method
         self._set_feature_extraction_parameters(parameters)
 
     def get_feature_extraction_method(self) -> str:
-        return self.feature_extraction_method
+        return self.selected_feature_extraction_method
+    
+    def get_all_feature_extraction_methods(self) -> list[str]:
+        return self.all_feature_extraction_methods
     
     def set_clustering_method(self, clustering_method:str):
         self.clustering_method = clustering_method
@@ -147,9 +151,9 @@ class Model:
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
         # TODO Check if the features were calculated with the same parameters, if not, recalculate them
-        print(f"Selected feature extraction method: {self.feature_extraction_method}")
+        print(f"Selected feature extraction method: {self.selected_feature_extraction_method}")
         print(f"File saved feature extraction method: {self.configFileManager.get_config_parameter('cache', 'method')}")
-        feature_extraction_method_changed:bool = self.feature_extraction_method != self.configFileManager.get_config_parameter('cache', 'method')
+        feature_extraction_method_changed:bool = self.selected_feature_extraction_method != self.configFileManager.get_config_parameter('cache', 'method')
         if self.force_recalculate_features or feature_extraction_method_changed:
             print("Forcing recalculation of features")
             images_cached_features = {}       
@@ -177,7 +181,7 @@ class Model:
         print(f"{len(images_cached_features)} images did not need to be loaded")
 
         # Create SimilarityCalculator object
-        similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.feature_extraction_method)
+        similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.selected_feature_extraction_method)
         similarity_calculator.set_feature_extraction_parameters(self.feature_extraction_parameters)
         
         # Run similarity calculator
@@ -194,7 +198,7 @@ class Model:
         if self.save_calculated_features and len(images_pixel_data) > 0:
             print("Saving calculated features to cache file")
             presenter.step_started(Steps.cache_features)
-            self.cached_features_method = self.feature_extraction_method
+            self.cached_features_method = self.selected_feature_extraction_method
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features

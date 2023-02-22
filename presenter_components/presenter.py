@@ -17,7 +17,7 @@ class Presenter:
         model_images_path = self.model.get_images_path()
         folder_path_entry = model_images_path if model_images_path else "No folder selected"
         self.view.update_path_entry(folder_path_entry)
-        # TODO should access through a method to change the state of the checkbox
+        # POSSIBLE_UPGRADE should access through a method to change the state of the checkbox
         self.view.config_panel.subdirectories_checkbox.select() if self.model.get_check_subdirectories() else self.view.config_panel.subdirectories_checkbox.deselect()
 
         # Update file types checkboxes
@@ -28,9 +28,8 @@ class Presenter:
                 self.view.config_panel.file_types_variables[file_type[1:]].set(False)
 
         # Update feature extraction method selection
-        # TODO make this scalable and not hardcoded
-        items = ['vgg16', 'mobilenet', 'color_histogram']
-        self.view.config_panel.select_feature_extraction_method(items.index(self.model.get_feature_extraction_method()))
+        feature_extraction_methods = self.model.get_all_feature_extraction_methods()
+        self.view.config_panel.select_feature_extraction_method(feature_extraction_methods.index(self.model.get_feature_extraction_method()))
         self.view.config_panel.cache_features_checkbox.select() if self.model.get_save_calculated_features() else self.view.config_panel.cache_features_checkbox.deselect()
         self.view.config_panel.force_recalculate_features_checkbox.select() if self.model.get_force_recalculate_features() else self.view.config_panel.force_recalculate_features_checkbox.deselect()
         
@@ -153,3 +152,6 @@ class Presenter:
             os.startfile(path)
         except Exception as e:
             print(e)
+
+    def get_feature_extraction_methods(self) -> list[str]:
+        return self.model.get_all_feature_extraction_methods()

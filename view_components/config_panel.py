@@ -5,6 +5,7 @@ from tkinter import ttk
 from tkinter import filedialog
 
 import threading
+import json
 
 class ConfigPanel(tk.Frame):
 
@@ -26,6 +27,7 @@ class ConfigPanel(tk.Frame):
         self.run_frame = tk.Frame(self)
         self.run_frame.grid(row=5, column=0, sticky="nsew", pady=10)
 
+        self.load_feature_extraction_methods_descriptions()
 
         self._create_file_search_submenu(presenter)
         self._create_feature_extraction_submenu(presenter)
@@ -155,7 +157,7 @@ class ConfigPanel(tk.Frame):
 
     def _on_feature_extraction_method_selected(self, event):
         method = self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())
-        self.update_feature_extraction_textbox(method + " TODO GET THIS FROM SOMEWHERE")
+        self.update_feature_extraction_textbox(self.feature_extraction_methods_descriptions[method])
 
     def update_feature_extraction_textbox(self, text):
         self.feature_extraction_textbox.config(state=tk.NORMAL)
@@ -203,3 +205,13 @@ class ConfigPanel(tk.Frame):
 
     def get_force_recalculate_features_checkbox_state(self) -> bool:
         return self.force_recalculate_features_var.get()
+    
+    def load_feature_extraction_methods_descriptions(self) -> None: #TODO: File path shoud be a constant
+        try:
+            with open("feature_extraction_methods_descriptions.json", "r") as f:
+                self.feature_extraction_methods_descriptions = json.load(f)
+        except Exception as e:
+            print(e)
+            self.feature_extraction_methods_descriptions = {"vgg16": "", "mobilenet": "", "color_histogram": ""}
+            for method in self.feature_extraction_methods_descriptions:
+                self.feature_extraction_methods_descriptions[method] = "No description available for " + method

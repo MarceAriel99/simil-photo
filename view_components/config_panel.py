@@ -7,6 +7,8 @@ from tkinter import filedialog
 import threading
 import json
 
+METHODS_DESCRIPTIONS_FILE_PATH = 'feature_extraction_methods_descriptions.json'
+
 class ConfigPanel(tk.Frame):
 
     def __init__(self, parent, window, presenter, *args, **kwargs):
@@ -206,9 +208,9 @@ class ConfigPanel(tk.Frame):
     def get_force_recalculate_features_checkbox_state(self) -> bool:
         return self.force_recalculate_features_var.get()
     
-    def load_feature_extraction_methods_descriptions(self) -> None: #TODO: File path shoud be a constant
+    def load_feature_extraction_methods_descriptions(self) -> None:
         try:
-            with open("feature_extraction_methods_descriptions.json", "r") as f:
+            with open(METHODS_DESCRIPTIONS_FILE_PATH, "r") as f:
                 self.feature_extraction_methods_descriptions = json.load(f)
         except Exception as e:
             print(e)

@@ -16,7 +16,6 @@ from constants import *
 # TODO: add exception checks everywhere
 # TODO: add logging
 # TODO: add comments
-# TODO: add type hints
 
 class Model:
     def __init__(self) -> None:

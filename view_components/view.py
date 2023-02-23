@@ -4,7 +4,8 @@ from tkinter import ttk
 from view_components.dynamic_grid import DynamicGrid
 from view_components.config_panel import ConfigPanel
 from view_components.top_bar import TopBar
-  
+
+#TODO: Add a theme to the app
 class View(tk.Tk):
 
     # GUI SETUP

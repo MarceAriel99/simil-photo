@@ -126,11 +126,8 @@ class Presenter:
             return
 
         self.view.set_path_entry_highlight(False)
-
         self._apply_config_to_model() 
-
         self.view.config_panel.progress_bar["value"] = 0
-
         self.model.run(self)
 
     def add_message_to_queue(self, message: Steps) -> None:

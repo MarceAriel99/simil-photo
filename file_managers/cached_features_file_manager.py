@@ -4,7 +4,7 @@ import numpy as np
 
 TEMP_FILE_NAME = 'TEMP.csv'
 
-def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int, np.array]:
+def load_cached_features(images_ids_paths:dict[int, str], file_path:str) -> dict[int, np.array]:
 
     cached_features = {}
 
@@ -25,7 +25,7 @@ def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int
 
     return cached_features
 
-def save_cached_features(images_paths_features:dict[str, np.array], file_path, force_overwrite:bool = False):
+def save_cached_features(images_paths_features:dict[str, np.array], file_path:str, force_overwrite:bool = False) -> None:
 
     if force_overwrite: print("Force overwrite is enabled, this will overwrite all the cached features")
 

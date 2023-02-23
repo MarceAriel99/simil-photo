@@ -7,7 +7,7 @@ import view_components.tooltip as tooltip
 
 class ImageCard(tk.Frame):
 
-    def __init__(self, parent, window, presenter, path, *args, **kwargs):
+    def __init__(self, parent, window, presenter, path, *args, **kwargs) -> None:
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.presenter = presenter
         self.window = window
@@ -15,7 +15,7 @@ class ImageCard(tk.Frame):
         self.grid = parent
         self._initialize(presenter)
         
-    def _initialize(self, presenter):
+    def _initialize(self, presenter) -> None:
         
         # Title
         self.title_label = tk.Label(self)
@@ -80,6 +80,6 @@ class ImageCard(tk.Frame):
         self.open_button.bind("<Button-1>", lambda event, path=self.path: self.presenter.handle_open_button_click(path))
         self.open_button.grid(row=5, column=1, sticky=tk.E, padx=5, pady=2)
     
-    def handle_delete_button_click(self, path):
+    def handle_delete_button_click(self, path:str) -> None:
         self.presenter.handle_delete_button_click(path)
         self.destroy()

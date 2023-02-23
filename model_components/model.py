@@ -13,7 +13,6 @@ import cv2
 from steps import Steps
 from constants import *
 
-# TODO: add constants for the config file parameters
 # TODO: add exception checks everywhere
 # TODO: add logging
 # TODO: add comments
@@ -42,7 +41,7 @@ class Model:
         self._read_config_file()
         print("Model created")
 
-    def _read_config_file(self): 
+    def _read_config_file(self) -> None: 
         images_path_in_file = self.configFileManager.get_config_parameter(CONFIG_SECTION_PATHS, CONFIG_PARAMETER_IMAGES_PATH)
         self.images_path = images_path_in_file if images_path_in_file != '' else self.images_path
 
@@ -63,7 +62,7 @@ class Model:
 
         self.check_subdirectories = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_MISC, CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES) == 'True' else False     
 
-    def update_config_file(self):
+    def update_config_file(self) -> None:
         config_parameters = {}
         
         config_parameters[CONFIG_SECTION_PATHS] = {CONFIG_PARAMETER_IMAGES_PATH: self.images_path, 
@@ -83,10 +82,10 @@ class Model:
 
         self.configFileManager.set_config_parameters(config_parameters)
 
-    def _set_feature_extraction_parameters(self, parameters:dict[str,any]={}):
+    def _set_feature_extraction_parameters(self, parameters:dict[str,any]={}) -> None:
         self.feature_extraction_parameters = parameters
 
-    def set_file_types(self, file_types:list[str]):
+    def set_file_types(self, file_types:list[str]) -> None:
         self.selected_file_types = file_types
 
     def get_selected_file_types(self) -> list[str]:
@@ -95,7 +94,7 @@ class Model:
     def get_all_file_types(self) -> list[str]:
         return self.all_file_types
 
-    def set_feature_extraction_method(self, feature_extraction_method:str, parameters:dict[str,any]={}):
+    def set_feature_extraction_method(self, feature_extraction_method:str, parameters:dict[str,any]={}) -> None:
         self.selected_feature_extraction_method = feature_extraction_method
         self._set_feature_extraction_parameters(parameters)
 
@@ -105,19 +104,19 @@ class Model:
     def get_all_feature_extraction_methods(self) -> list[str]:
         return self.all_feature_extraction_methods
     
-    def set_clustering_method(self, clustering_method:str):
+    def set_clustering_method(self, clustering_method:str) -> None:
         self.clustering_method = clustering_method
     
-    def set_images_path(self, images_path:str):
+    def set_images_path(self, images_path:str) -> None:
         self.images_path = images_path
 
-    def get_images_path(self):
+    def get_images_path(self) -> str:
         return self.images_path
 
-    def set_check_subdirectories(self, check_subdirectories:bool):
+    def set_check_subdirectories(self, check_subdirectories:bool) -> None:
         self.check_subdirectories = check_subdirectories
 
-    def get_check_subdirectories(self):
+    def get_check_subdirectories(self) -> bool:
         return self.check_subdirectories
 
     def set_save_calculated_features(self, save_calculated_features:bool, cache_file_path:str=PATH_DEFAULT_CACHE_FILE):
@@ -127,13 +126,13 @@ class Model:
     def get_save_calculated_features(self) -> bool:
         return self.save_calculated_features
     
-    def set_force_recalculate_features(self, force_recalculate_features:bool):
+    def set_force_recalculate_features(self, force_recalculate_features:bool) -> None:
         self.force_recalculate_features = force_recalculate_features
 
     def get_force_recalculate_features(self) -> bool:
         return self.force_recalculate_features
 
-    def run(self, presenter):
+    def run(self, presenter) -> None:
 
         self.images_ids_paths = {}
         self.images_clusters = []
@@ -174,12 +173,11 @@ class Model:
             images_cached_features = cached_features_file_manager.load_cached_features(self.images_ids_paths, self.cache_file_path)
             presenter.step_completed(Steps.load_cached_features)
 
-        
         # Load images
         # images_pixel_data is a dict with {id: pixel_data} pairs (without cached features)
         presenter.step_started(Steps.load_images)
 
-        images_pixel_data = {} 
+        images_pixel_data = {}
         for (image_id, image_path) in self.images_ids_paths.items():
             if image_id in images_cached_features:
                 continue
@@ -221,6 +219,7 @@ class Model:
 
         # Filter clusters with only one image
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
+
         presenter.run_completed()
     
     def get_clusters_paths(self) -> list[list[str]]:

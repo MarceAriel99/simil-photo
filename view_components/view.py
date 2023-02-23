@@ -9,14 +9,14 @@ class View(tk.Tk):
 
     # GUI SETUP
 
-    def __init__(self):
+    def __init__(self) -> None:
         print("View created")
         super().__init__()
         self.title('SimilPhoto')
         self.minsize(width=800, height=730)
         self.geometry('1600x680')
 
-    def init_ui(self, presenter):
+    def init_ui(self, presenter) -> None:
         print("Initializing UI")
         self.main_frame = tk.Frame(self, padx=10, pady=10)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
@@ -37,13 +37,13 @@ class View(tk.Tk):
 
     # CONFIG PANEL
 
-    def update_path_entry(self, path):
+    def update_path_entry(self, path:str) -> None:
         self.config_panel.update_path_entry(path)
 
     def select_folder(self) -> str:
         return self.config_panel.select_folder()
 
-    def set_path_entry_highlight(self, highlight:bool):
+    def set_path_entry_highlight(self, highlight:bool) -> None:
         self.config_panel.set_path_entry_highlight(highlight)
 
     def get_images_path(self) -> str:
@@ -64,36 +64,36 @@ class View(tk.Tk):
     def get_force_recalculate_features_checkbox_state(self) -> bool:
         return self.config_panel.get_force_recalculate_features_checkbox_state()
 
-    def add_message_to_queue(self, message:str):
+    def add_message_to_queue(self, message:str) -> None:
         self.config_panel.queue.put(message)
 
     # IMAGES GRID
 
-    def load_and_display_images(self, images_paths:list[str]):
+    def load_and_display_images(self, images_paths:list[str]) -> None:
         self.empty_grid()
         for image_path in images_paths:
             self.images_grid.add_image(image_path)
 
-    def empty_grid(self):
+    def empty_grid(self) -> None:
         self.images_grid.delete_all_images()
 
     # TOP BAR
 
-    def update_status_label(self, text):
+    def update_status_label(self, text:str) -> None:
         self.top_bar.status_label.configure(text=text)
 
-    def update_current_group_label(self, group_index:int, groups_count:int):
+    def update_current_group_label(self, group_index:int, groups_count:int) -> None:
         self.top_bar.current_group_label.configure(text=f"{group_index+1}/{groups_count}")
 
-    def change_group_frame_visibility(self, visible:bool=True):
+    def change_group_frame_visibility(self, visible:bool=True) -> None:
         self.top_bar.group_frame.pack(side=tk.RIGHT) if visible else self.top_bar.group_frame.pack_forget()
 
-    def change_group_buttons_state(self, visible:bool=True, state:str="normal"):
+    def change_group_buttons_state(self, visible:bool=True, state:str="normal") -> None:
         self.next_button_state(visible, state)
         self.previous_button_state(visible, state)
 
-    def next_button_state(self, state:str="normal"):
+    def next_button_state(self, state:str="normal") -> None:
         self.top_bar.rigth_arrow_button.configure(state=state)
 
-    def previous_button_state(self, state:str="normal"):
+    def previous_button_state(self, state:str="normal") -> None:
         self.top_bar.left_arrow_button.configure(state=state)

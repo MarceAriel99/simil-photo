@@ -13,14 +13,14 @@ from feature_extractors.mobilenet_extractor import MobileNetFeatureExtractor
 
 class SimilarityCalculator():
 
-    def __init__(self, images_pixel_data, images_cached_features:dict[int,np.array]={}, feature_extraction_method='vgg16', clustering_method='affinity_propagation') -> None:
+    def __init__(self, images_pixel_data:dict[int,np.array]={}, images_cached_features:dict[int,np.array]={}, feature_extraction_method:str='vgg16', clustering_method:str='affinity_propagation') -> None:
 
         self.feature_extraction_method = feature_extraction_method # Could be 'color_histogram', 'vgg16', 'vgg19', 'resnet50'... Implement more methods
 
-        #TODO: Change this to a class 'ClusteringCalculator' or interface because implementing more methods will make this class too big
+        #POSSIBLE UPGRADE: Change this to a class 'ClusteringCalculator' or interface because implementing more methods will make this class too big
         self.clustering_method = clustering_method # Could be 'affinity_propagation', 'kmeans', 'dbscan'... Implement more methods
 
-        self.images_pixel_data = images_pixel_data # Dictionary with {id: path} pairs
+        self.images_pixel_data = images_pixel_data # Dictionary with {id: data} pairs
 
         self.image_features = images_cached_features # Dictionary with {id: features} pairs
 
@@ -32,7 +32,7 @@ class SimilarityCalculator():
         self.feature_extraction_method = feature_extraction_method
         self.set_feature_extraction_parameters(parameters)
 
-    def set_feature_extraction_parameters(self, parameters: dict) -> None:
+    def set_feature_extraction_parameters(self, parameters: dict[str, any]) -> None:
         self.feature_extraction_parameters = parameters
 
     def set_clustering_method(self, clustering_method: str) -> None:
@@ -56,6 +56,8 @@ class SimilarityCalculator():
 
         # Calculate clusters
         self.image_clusters = self._calculate_clusters(self.similarity_matrix)
+
+        #TODO: Sort images in each cluster by similarity
 
         return self.image_clusters
     

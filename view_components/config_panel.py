@@ -13,13 +13,13 @@ from constants import *
 
 class ConfigPanel(tk.Frame):
 
-    def __init__(self, parent, window, presenter, *args, **kwargs):
+    def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.presenter = presenter
         self.window = window
         self._initialize(presenter)
         
-    def _initialize(self, presenter):
+    def _initialize(self, presenter) -> None:
         self.config_title_label = tk.Label(self, text="Configuration", font=("Arial", 20))
         self.config_title_label.grid(row=0, column=0, sticky="nw")
         self.file_search_frame = tk.Frame(self)
@@ -37,7 +37,7 @@ class ConfigPanel(tk.Frame):
         self._create_feature_extraction_submenu(presenter)
         self._create_run_submenu(presenter)
 
-    def _create_file_search_submenu(self, presenter):
+    def _create_file_search_submenu(self, presenter) -> None:
 
         self.file_search_title_label = tk.Label(self.file_search_frame, text="File search", font=("Arial", 15, 'bold', 'underline'))
         self.path_label = tk.Label(self.file_search_frame, text="Searching for images in path:")
@@ -82,7 +82,7 @@ class ConfigPanel(tk.Frame):
         self.select_folder_button.grid(row=2, column=2, sticky=tk.E, pady=5)
         self.file_types_frame.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=(5,0))
 
-    def _create_feature_extraction_submenu(self, presenter):
+    def _create_feature_extraction_submenu(self, presenter) -> None:
 
         self.feature_extraction_title_label = tk.Label(self.feature_extraction_frame, text="Feature extraction", font=("Arial", 15, 'bold', 'underline'))
 
@@ -136,12 +136,12 @@ class ConfigPanel(tk.Frame):
         self.queue = queue.Queue()
         self.periodic_call()
 
-    def periodic_call(self):
+    def periodic_call(self) -> None:
         """ Check every 100 ms if there is something new in the queue. """
         self.master.after(100, self.periodic_call)
         self.processIncoming()
 
-    def processIncoming(self):
+    def processIncoming(self) -> None:
         """ Handle all the messages currently in the queue, if any. """
         while self.queue.qsize():
             try:
@@ -160,25 +160,25 @@ class ConfigPanel(tk.Frame):
             except queue.Empty:
                 pass
 
-    def select_feature_extraction_method(self, method):
+    def select_feature_extraction_method(self, method:str) -> None:
         self.feature_extraction_listbox.select_set(method)
         self._on_feature_extraction_method_selected(None)
 
-    def _on_feature_extraction_method_selected(self, event):
+    def _on_feature_extraction_method_selected(self, event) -> None:
         method = self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())
         self.update_feature_extraction_textbox(self.feature_extraction_methods_descriptions[method])
 
-    def update_feature_extraction_textbox(self, text):
+    def update_feature_extraction_textbox(self, text:str) -> None:
         self.feature_extraction_textbox.config(state=tk.NORMAL)
         self.feature_extraction_textbox.delete(1.0, tk.END)
         self.feature_extraction_textbox.insert(tk.END, text)
         self.feature_extraction_textbox.config(state=tk.DISABLED)
 
-    def update_path_entry(self, path):
+    def update_path_entry(self, path:str) -> None:
         self.path_entry.delete(0, tk.END)
         self.path_entry.insert(0, path)
 
-    def update_run_status_label(self, text):
+    def update_run_status_label(self, text:str) -> None:
         self.run_status_label.config(text=text)
 
     def set_path_entry_highlight(self, highlight:bool=True):
@@ -221,7 +221,6 @@ class ConfigPanel(tk.Frame):
                 self.feature_extraction_methods_descriptions = json.load(f)
         except Exception as e:
             print(e)
-            # TODO generalize the dict creation
-            self.feature_extraction_methods_descriptions = {"vgg16": "", "mobilenet": "", "color_histogram": ""}
-            for method in self.feature_extraction_methods_descriptions:
+            self.feature_extraction_methods_descriptions = {}
+            for method in CONFIG_DEFAULT_VALUE_SUPPORTED_FEATURE_EXTRACTION_METHODS.split(','):
                 self.feature_extraction_methods_descriptions[method] = "No description available for " + method

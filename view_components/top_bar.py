@@ -2,13 +2,13 @@ import tkinter as tk
 
 class TopBar(tk.Frame):
 
-    def __init__(self, parent, window, presenter, *args, **kwargs):
+    def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.presenter = presenter
         self.window = window
         self._initialize(presenter)
         
-    def _initialize(self, presenter):
+    def _initialize(self, presenter) -> None:
         self.status_label = tk.Label(self, text="", font=('TkDefaultFont', 16, "bold"))
         self.status_label.pack(side=tk.LEFT)
 

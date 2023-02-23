@@ -1,5 +1,5 @@
 {
-    "vgg16":"It can capture complex patterns and features in images, making it an effective tool for clustering similar images. However, due to its large number of parameters and computational cost, it may not be practical for all applications.",
-    "mobilenet":"Efficient for large-scale clustering tasks. Although it may not be able to capture image features as accurately as more complex models like VGG16, its computational efficiency makes it a practical option for certain applications.",
-    "color_histogram":"Quantifies the distribution of colors. While it may not capture all the relevant features in images such as texture and shape, it may still uncover unique image clusters that are not detected by other methods due to its focus on color information. It usually makes more mistakes."
+    "vgg16":"It can capture complex patterns and features in images. However, it has a high computational cost, so the execution time is relatively slow.",
+    "mobilenet":"Although it may not be able to capture image features as accurately as more complex models like VGG16, its execution is considerably faster.",
+    "color_histogram":"It does not capture relevant features such as texture and shape, but it may still uncover unique image clusters that are not detected by other methods. It usually makes more mistakes but its execution is very fast."
 }

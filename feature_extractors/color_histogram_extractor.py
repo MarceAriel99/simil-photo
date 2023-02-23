@@ -25,6 +25,8 @@ class ColorHistogramFeatureExtractor():
     # Calculates the signature of an image by using color distribution
     # Separates each color in a number of bins 
     def _calculate_features_of_image(self, img: np.ndarray, color_bins: int, signature_length: int, array_multipliers: dict[int, int]) -> np.ndarray:
+
+        # Start the timer
         start = timeit.default_timer()
 
         r, g, b = img[..., 0], img[..., 1], img[..., 2]
@@ -38,6 +40,7 @@ class ColorHistogramFeatureExtractor():
         bucket_indices = r_indices * array_multipliers[0] + g_indices * array_multipliers[1] + b_indices * array_multipliers[2]
         signature = np.bincount(bucket_indices.flatten(), minlength=signature_length)
 
+        # End the timer and print the elapsed time
         end = timeit.default_timer()
         print(f"{int((end - start) * 10 ** 6)} us/step")
 

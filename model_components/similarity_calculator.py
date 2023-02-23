@@ -57,7 +57,8 @@ class SimilarityCalculator():
         # Calculate clusters
         self.image_clusters = self._calculate_clusters(self.similarity_matrix)
 
-        #TODO: Sort images in each cluster by similarity
+        #Sort images in each cluster by similarity
+        self.image_clusters = self._sort_images_by_similarity(self.image_clusters)
 
         return self.image_clusters
     
@@ -113,3 +114,31 @@ class SimilarityCalculator():
             clusters[group].append(index)
         
         return clusters
+    
+    # Receives a list of lists with id's of similar images and returns the same list but ordered by similarity inside each cluster
+    def _sort_images_by_similarity(self, clusters: list[list[int]]) -> list[list[int]]:
+
+        ordered_clusters = []
+        cluster_centers = []
+
+        #Find the center of each cluster
+        for cluster in clusters:
+            array_of_features = np.array([self.image_features[image_id] for image_id in cluster])
+            center = np.mean(array_of_features, axis=0)
+
+            #Get the index of the image that is closest to the center
+            most_central_image_index = np.argmin(np.linalg.norm(array_of_features - center, axis=1))
+
+            #Get the id of the image that is closest to the center
+            most_central_image_id = cluster[most_central_image_index]
+
+            #print(f"All cluster images: {cluster}")
+            #print(f"Cluster center image id: {most_central_image_id}")
+
+            cluster_centers.append(most_central_image_id)
+
+        #Sort each cluster by similarity to the center, starting with the most similar image
+        for (index, cluster) in enumerate(clusters):
+            ordered_clusters.append(sorted(cluster, key=lambda x: self.similarity_matrix[cluster_centers[index]][x], reverse=True))
+
+        return ordered_clusters

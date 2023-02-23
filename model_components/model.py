@@ -11,6 +11,7 @@ import keras.utils as image
 import cv2
 
 from steps import Steps
+from constants import *
 
 # TODO: add constants for the config file parameters
 # TODO: add exception checks everywhere
@@ -18,59 +19,68 @@ from steps import Steps
 # TODO: add comments
 # TODO: add type hints
 
-DEFAULT_CACHE_FILE_PATH = 'cached_features.csv'
-
 class Model:
     def __init__(self) -> None:
         # Set default parameters, some of them will be updated with the config file if it exists
 
         self.images_path:str = ''
         self.check_subdirectories:bool = True
-        self.cache_file_path:str = DEFAULT_CACHE_FILE_PATH
-        self.selected_feature_extraction_method:str = 'vgg16'
-        self.selected_file_types:list[str] = ['.jpg', '.jpeg', '.png']
-        self.clustering_method:str = 'affinity_propagation'
+        self.cache_file_path:str = PATH_DEFAULT_CACHE_FILE
+        self.selected_feature_extraction_method:str = CONFIG_DEFAULT_VALUE_SELECTED_FEATURE_EXTRACTION_METHOD
+        self.selected_file_types:list[str] = CONFIG_DEFAULT_VALUE_SELECTED_FILE_TYPES
+        self.clustering_method:str = CONFIG_DEFAULT_VALUE_CLUSTERING_METHOD
         self.feature_extraction_parameters:dict[str,any] = {}
         self.similarity_calculator:SimilarityCalculator = None
 
         self.images_ids_paths:dict[int,str] = {} #{id: absolute_path}
         self.images_clusters:list[list[int]] = []
 
-        self.force_recalculate_features:bool = False
-        self.save_calculated_features:bool = True
+        self.force_recalculate_features:bool = CONFIG_DEFAULT_VALUE_CACHE_FORCE_RECALCULATE_FEATURES
+        self.save_calculated_features:bool = CONFIG_DEFAULT_VALUE_CACHE_SAVE_CALCULATED_FEATURES
 
         self.configFileManager = ConfigFileManager()
         self._read_config_file()
         print("Model created")
 
-    # TODO add exception checks if the config file is not valid, try to load the default values for each invalid parameter
     def _read_config_file(self): 
-        images_path_in_file = self.configFileManager.get_config_parameter('paths', 'images_path')
+        images_path_in_file = self.configFileManager.get_config_parameter(CONFIG_SECTION_PATHS, CONFIG_PARAMETER_IMAGES_PATH)
         self.images_path = images_path_in_file if images_path_in_file != '' else self.images_path
 
-        cache_file_path_in_file = self.configFileManager.get_config_parameter('paths', 'cache_file_path')
+        cache_file_path_in_file = self.configFileManager.get_config_parameter(CONFIG_SECTION_PATHS, CONFIG_PARAMETER_CACHE_FILE_PATH)
         self.cache_file_path = cache_file_path_in_file if cache_file_path_in_file != '' else self.cache_file_path
 
-        self.selected_feature_extraction_method = self.configFileManager.get_config_parameter('feature_extraction', 'selected')
-        self.all_feature_extraction_methods = self.configFileManager.get_config_parameter('feature_extraction', 'supported').split(',')
-        self.selected_file_types = self.configFileManager.get_config_parameter('file_types', 'selected').split(',')
-        self.all_file_types = self.configFileManager.get_config_parameter('file_types', 'supported').split(',')
-        self.clustering_method = self.configFileManager.get_config_parameter('clustering', 'method')
-        self.force_recalculate_features = True if self.configFileManager.get_config_parameter('cache', 'force_recalculate_features') == 'True' else False
-        self.save_calculated_features = True if self.configFileManager.get_config_parameter('cache', 'save_calculated_features') == 'True' else False
-        self.cached_features_method = self.configFileManager.get_config_parameter('cache', 'method')
-        self.check_subdirectories = True if self.configFileManager.get_config_parameter('misc', 'check_subdirectories') == 'True' else False     
+        self.selected_feature_extraction_method = self.configFileManager.get_config_parameter(CONFIG_SECTION_FEATURE_EXTRACTION, CONFIG_PARAMETER_SELECTED_FEATURE_EXTRACTION_METHOD)
+        self.all_feature_extraction_methods = self.configFileManager.get_config_parameter(CONFIG_SECTION_FEATURE_EXTRACTION, CONFIG_PARAMETER_SUPPORTED_FEATURE_EXTRACTION_METHOD).split(',')
+
+        self.selected_file_types = self.configFileManager.get_config_parameter(CONFIG_SECTION_FILE_TYPES, CONFIG_PARAMETER_SELECTED_FILE_TYPES).split(',')
+        self.all_file_types = self.configFileManager.get_config_parameter(CONFIG_SECTION_FILE_TYPES, CONFIG_PARAMETER_SUPPORTED_FILE_TYPES).split(',')
+
+        self.clustering_method = self.configFileManager.get_config_parameter(CONFIG_SECTION_CLUSTERING, CONFIG_PARAMETER_CLUSTERING_METHOD)
+
+        self.force_recalculate_features = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_FORCE_RECALCULATE_FEATURES) == 'True' else False
+        self.save_calculated_features = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_SAVE_CALCULATED_FEATURES) == 'True' else False
+        self.cached_features_method = self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_FEATURE_EXTRACTION_METHOD)
+
+        self.check_subdirectories = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_MISC, CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES) == 'True' else False     
 
     def update_config_file(self):
         config_parameters = {}
-        config_parameters['paths'] = {'images_path': self.images_path, 'cache_file_path': self.cache_file_path}
-        config_parameters['misc'] = {'check_subdirectories': str(self.check_subdirectories)}
-        config_parameters['file_types'] = {'selected': ','.join(self.selected_file_types)}
-        config_parameters['feature_extraction'] = {'selected': self.selected_feature_extraction_method}
-        config_parameters['clustering'] = {'method': self.clustering_method}
-        config_parameters['cache'] = {'force_recalculate_features': str(self.force_recalculate_features), 
-        'save_calculated_features': str(self.save_calculated_features), 
-        'method': self.cached_features_method }
+        
+        config_parameters[CONFIG_SECTION_PATHS] = {CONFIG_PARAMETER_IMAGES_PATH: self.images_path, 
+                                                   CONFIG_PARAMETER_CACHE_FILE_PATH: self.cache_file_path}
+        
+        config_parameters[CONFIG_SECTION_FEATURE_EXTRACTION] = {CONFIG_PARAMETER_SELECTED_FEATURE_EXTRACTION_METHOD: self.selected_feature_extraction_method}
+
+        config_parameters[CONFIG_SECTION_FILE_TYPES] = {CONFIG_PARAMETER_SELECTED_FILE_TYPES: ','.join(self.selected_file_types)}
+
+        config_parameters[CONFIG_SECTION_CLUSTERING] = {CONFIG_PARAMETER_CLUSTERING_METHOD: self.clustering_method}
+
+        config_parameters[CONFIG_SECTION_CACHE] = {CONFIG_PARAMETER_CACHE_FORCE_RECALCULATE_FEATURES: str(self.force_recalculate_features), 
+        CONFIG_PARAMETER_CACHE_SAVE_CALCULATED_FEATURES: str(self.save_calculated_features), 
+        CONFIG_PARAMETER_CACHE_FEATURE_EXTRACTION_METHOD: self.cached_features_method }
+
+        config_parameters[CONFIG_SECTION_MISC] = {CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES: str(self.check_subdirectories)}
+
         self.configFileManager.set_config_parameters(config_parameters)
 
     def _set_feature_extraction_parameters(self, parameters:dict[str,any]={}):
@@ -110,7 +120,7 @@ class Model:
     def get_check_subdirectories(self):
         return self.check_subdirectories
 
-    def set_save_calculated_features(self, save_calculated_features:bool, cache_file_path:str=DEFAULT_CACHE_FILE_PATH):
+    def set_save_calculated_features(self, save_calculated_features:bool, cache_file_path:str=PATH_DEFAULT_CACHE_FILE):
         self.save_calculated_features = save_calculated_features
         self.cache_file_path = cache_file_path
 
@@ -131,7 +141,7 @@ class Model:
         presenter.step_started(Steps.search_images)
 
         # Search for images in path
-        # TODO give option to search in a group of folders
+        # POSSIBLE UPGRADE give option to search in a group of folders
         print(f"Searching for images in {self.images_path} with file types ({self.selected_file_types})")
         images_names_paths = file_searcher.file_search(self.images_path, tuple(self.selected_file_types), self.check_subdirectories)
 
@@ -150,7 +160,9 @@ class Model:
 
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
-        # TODO Check if the features were calculated with the same parameters, if not, recalculate them
+
+        # POSSIBLE UPGRADE: Check if the features were calculated with the same parameters, if not, recalculate them 
+        # (Currently it doesn't make sense because the user cannot change the parameters)
         print(f"Selected feature extraction method: {self.selected_feature_extraction_method}")
         print(f"File saved feature extraction method: {self.configFileManager.get_config_parameter('cache', 'method')}")
         feature_extraction_method_changed:bool = self.selected_feature_extraction_method != self.configFileManager.get_config_parameter('cache', 'method')
@@ -171,7 +183,7 @@ class Model:
         for (image_id, image_path) in self.images_ids_paths.items():
             if image_id in images_cached_features:
                 continue
-            img = image.load_img(image_path, target_size=(224, 224)) #TODO try other sizes
+            img = image.load_img(image_path, target_size=(224, 224))
             img_data = image.img_to_array(img)
             images_pixel_data[image_id] = img_data
 
@@ -182,6 +194,7 @@ class Model:
 
         # Create SimilarityCalculator object
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.selected_feature_extraction_method)
+        # Set feature extraction parameters
         similarity_calculator.set_feature_extraction_parameters(self.feature_extraction_parameters)
         
         # Run similarity calculator

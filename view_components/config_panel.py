@@ -7,7 +7,7 @@ from tkinter import filedialog
 import threading
 import json
 
-METHODS_DESCRIPTIONS_FILE_PATH = 'feature_extraction_methods_descriptions.json'
+from constants import *
 
 #TODO: Include descriptions for configuration options (as tooltips)
 
@@ -115,7 +115,9 @@ class ConfigPanel(tk.Frame):
         self.force_recalculate_features_checkbox.pack(side=tk.LEFT)
         self.feature_cache_recalculate_frame.grid(row=3, column=0, columnspan=4, sticky=tk.W, pady=(15,0))
 
-    def _create_run_submenu(self, presenter):
+        # POSSIBLE UPGRADE: Make a second listbox for choosing the parameters of the selected feature extraction method
+
+    def _create_run_submenu(self, presenter) -> None:
         
         self.run_status_label = tk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
         self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10))
@@ -215,10 +217,11 @@ class ConfigPanel(tk.Frame):
     
     def load_feature_extraction_methods_descriptions(self) -> None:
         try:
-            with open(METHODS_DESCRIPTIONS_FILE_PATH, "r") as f:
+            with open(PATH_FEATURE_EXTRACTION_METHOD_DESCRIPTIONS_FILE, "r") as f:
                 self.feature_extraction_methods_descriptions = json.load(f)
         except Exception as e:
             print(e)
+            # TODO generalize the dict creation
             self.feature_extraction_methods_descriptions = {"vgg16": "", "mobilenet": "", "color_histogram": ""}
             for method in self.feature_extraction_methods_descriptions:
                 self.feature_extraction_methods_descriptions[method] = "No description available for " + method

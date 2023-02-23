@@ -1,4 +1,5 @@
 import configparser
+from constants import *
 
 CONFIG_FILE_PATH = 'config.ini'
 
@@ -28,12 +29,23 @@ class ConfigFileManager:
 
     def _create_config_file(self): #TODO: generalize this method
         print("Creating config file...")
-        self.config['paths'] = {'images_path': '', 'cache_file_path': ''}
-        self.config['feature_extraction'] = {'supported': ','.join(['vgg16', 'mobilenet', 'color_histogram']), 'selected': 'vgg16'}
-        self.config['file_types'] = {'supported': ','.join(['.jpg', '.jpeg', '.png', '.webp']), 'selected': ','.join(['.jpg', '.jpeg', '.png', '.webp'])}
-        self.config['clustering'] = {'method': 'affinity_propagation'}
-        self.config['cache'] = {'force_recalculate_features': 'False', 'save_calculated_features': 'True', 'method': 'vgg16'}
-        self.config['misc'] = {'check_subdirectories': 'True'}
+        self.config[CONFIG_SECTION_PATHS] = {CONFIG_PARAMETER_IMAGES_PATH: CONFIG_DEFAULT_VALUE_IMAGES_PATH, 
+                                             CONFIG_PARAMETER_CACHE_FILE_PATH: CONFIG_DEFAULT_VALUE_CACHE_FILE_PATH}
+        
+        self.config[CONFIG_SECTION_FEATURE_EXTRACTION] ={
+                                            CONFIG_PARAMETER_SUPPORTED_FEATURE_EXTRACTION_METHOD: CONFIG_DEFAULT_VALUE_SUPPORTED_FEATURES, 
+                                            CONFIG_PARAMETER_SELECTED_FEATURE_EXTRACTION_METHOD: CONFIG_DEFAULT_VALUE_SELECTED_FEATURE_EXTRACTION_METHOD}
+        
+        self.config[CONFIG_SECTION_FILE_TYPES] = {CONFIG_PARAMETER_SUPPORTED_FILE_TYPES: CONFIG_DEFAULT_VALUE_SUPPORTED_FILE_TYPES, 
+                                                  CONFIG_PARAMETER_SELECTED_FILE_TYPES: CONFIG_DEFAULT_VALUE_SELECTED_FILE_TYPES}
+        
+        self.config[CONFIG_SECTION_CLUSTERING] = {CONFIG_PARAMETER_CLUSTERING_METHOD: CONFIG_DEFAULT_VALUE_CLUSTERING_METHOD}
+
+        self.config[CONFIG_SECTION_CACHE] = {CONFIG_PARAMETER_CACHE_FORCE_RECALCULATE_FEATURES: CONFIG_DEFAULT_VALUE_CACHE_FORCE_RECALCULATE_FEATURES,
+                                            CONFIG_PARAMETER_CACHE_SAVE_CALCULATED_FEATURES: CONFIG_DEFAULT_VALUE_CACHE_SAVE_CALCULATED_FEATURES,
+                                            CONFIG_PARAMETER_CACHE_FEATURE_EXTRACTION_METHOD: CONFIG_DEFAULT_VALUE_CACHE_FEATURE_EXTRACTION_METHOD}
+        
+        self.config[CONFIG_SECTION_MISC] = {CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES: CONFIG_DEFAULT_VALUE_MISC_CHECK_SUBDIRECTORIES}
 
         with open(CONFIG_FILE_PATH, 'w') as configfile:
             self.config.write(configfile)

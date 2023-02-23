@@ -25,7 +25,6 @@ def load_cached_features(images_ids_paths:dict[int, str], file_path) -> dict[int
 
     return cached_features
 
-# TODO manage exceptions (see other exceptions in addition to FileNotFoundError)
 def save_cached_features(images_paths_features:dict[str, np.array], file_path, force_overwrite:bool = False):
 
     if force_overwrite: print("Force overwrite is enabled, this will overwrite all the cached features")
@@ -57,6 +56,7 @@ def save_cached_features(images_paths_features:dict[str, np.array], file_path, f
 
     try:
         os.remove(file_path)
-    except FileNotFoundError as e:
+    except Exception as e:
         print(e)
+
     os.rename(TEMP_FILE_NAME, file_path)

@@ -17,7 +17,7 @@ class Presenter:
         model_images_path = self.model.get_images_path()
         folder_path_entry = model_images_path if model_images_path else "No folder selected"
         self.view.update_path_entry(folder_path_entry)
-        # POSSIBLE_UPGRADE should access through a method to change the state of the checkbox
+        # POSSIBLE UPGRADE should access through a method to change the state of the checkbox
         self.view.config_panel.subdirectories_checkbox.select() if self.model.get_check_subdirectories() else self.view.config_panel.subdirectories_checkbox.deselect()
 
         # Update file types checkboxes

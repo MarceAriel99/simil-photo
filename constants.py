@@ -31,4 +31,4 @@ CONFIG_DEFAULT_VALUE_MISC_CHECK_SUBDIRECTORIES = 'True'
 
 PATH_CONFIG_FILE = 'config.ini'
 PATH_DEFAULT_CACHE_FILE = 'cached_features.csv'
-PATH_FEATURE_EXTRACTION_METHOD_DESCRIPTIONS_FILE = 'feature_extraction_method_descriptions.json'
+PATH_FEATURE_EXTRACTION_METHOD_DESCRIPTIONS_FILE = 'feature_extraction_methods_descriptions.json'

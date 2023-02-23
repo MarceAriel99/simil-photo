@@ -52,8 +52,6 @@ class SimilarityCalculator():
         # Calculate similarity matrix
         self.similarity_matrix = self._calculate_similarity_matrix(self.image_features)
 
-        #TODO: Reduce dimensionality of features
-
     def run_cluster_calculation(self) -> list[list[int]]: # Each list inside contains a group of id's of similar images ordered by similarity
 
         # Calculate clusters

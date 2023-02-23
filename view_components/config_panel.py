@@ -9,6 +9,8 @@ import json
 
 METHODS_DESCRIPTIONS_FILE_PATH = 'feature_extraction_methods_descriptions.json'
 
+#TODO: Include descriptions for configuration options (as tooltips)
+
 class ConfigPanel(tk.Frame):
 
     def __init__(self, parent, window, presenter, *args, **kwargs):
@@ -123,6 +125,9 @@ class ConfigPanel(tk.Frame):
 
         self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
         self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
+
+        #TODO: Add a cancel button
+        #TODO: Add a label that shous the whole process duration once it's finished (Or just show it in the status label)
 
         self.run_button = tk.Button(self.run_frame, text="Run", command= lambda: threading.Thread(target=self.presenter.handle_run_button_click).start() )
         self.run_button.grid(row=3, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)

@@ -1,19 +1,27 @@
 import numpy as np
 
-from keras.applications.mobilenet_v2 import MobileNetV2
-from keras.applications.mobilenet_v2 import preprocess_input
+from keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
+from keras.layers import GlobalAveragePooling2D, Dense
+from keras.models import Model
 
 class MobileNetFeatureExtractor():
 
     def __init__(self, parameters:dict={}):
         weights = parameters['weights'] if 'weights' in parameters else 'imagenet'
         include_top = parameters['include_top'] if 'include_top' in parameters else False
-        self.model = MobileNetV2(include_top=include_top, weights=weights)
+        # Create the base pre-trained model with an output of 4096 features
+        mobilenet = MobileNetV2(include_top=include_top, weights=weights, input_shape=(224, 224, 3))
+        x = GlobalAveragePooling2D()(mobilenet.output)
+        x = Dense(4096, activation='relu')(x)
+        self.model = Model(inputs=mobilenet.input, outputs=x)
 
     def set_parameters(self, parameters:dict={}):
         weights = parameters['weights'] if 'weights' in parameters else 'imagenet'
         include_top = parameters['include_top'] if 'include_top' in parameters else False
-        self.model = MobileNetV2(include_top=include_top, weights=weights)
+        mobilenet = MobileNetV2(include_top=include_top, weights=weights, input_shape=(224, 224, 3))
+        x = GlobalAveragePooling2D()(mobilenet.output)
+        x = Dense(4096, activation='relu')(x)
+        self.model = Model(inputs=mobilenet.input, outputs=x)
 
     # This is done for all images, maybe we can pass list or set of images, and make some calculation just once (all pre-calculations)
     def extract_features(self, img): # Should accept more parameters
@@ -23,4 +31,6 @@ class MobileNetFeatureExtractor():
     def _calculate_features_of_image(self, img):
         img_data = np.expand_dims(img, axis=0)
         img_data = preprocess_input(img_data)
-        return np.array(self.model.predict(img_data)).flatten()
+        features = self.model.predict(img_data)
+
+        return features[0]

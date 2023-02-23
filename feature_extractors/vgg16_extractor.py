@@ -1,19 +1,27 @@
 import numpy as np
 
-from keras.applications.vgg16 import VGG16
-from keras.applications.vgg16 import preprocess_input
+from keras.applications.vgg16 import VGG16, preprocess_input
+from keras.layers import Flatten, Dense
+from keras.models import Model
 
 class VGG16FeatureExtractor():
 
     def __init__(self, parameters:dict={}):
         weights = parameters['weights'] if 'weights' in parameters else 'imagenet'
         include_top = parameters['include_top'] if 'include_top' in parameters else False
-        self.model = VGG16(include_top, weights)
+        # Create the base pre-trained model with an output of 4096 features
+        vgg16 = VGG16(include_top, weights, input_shape=(224, 224, 3))
+        x = Flatten()(vgg16.output)
+        x = Dense(4096, activation='relu')(x)
+        self.model = Model(inputs=vgg16.input, outputs=x)
 
     def set_parameters(self, parameters:dict={}):
         weights = parameters['weights'] if 'weights' in parameters else 'imagenet'
         include_top = parameters['include_top'] if 'include_top' in parameters else False
-        self.model = VGG16(include_top, weights)
+        vgg16 = VGG16(include_top, weights, input_shape=(224, 224, 3))
+        x = Flatten()(vgg16.output)
+        x = Dense(4096, activation='relu')(x)
+        self.model = Model(inputs=vgg16.input, outputs=x)
 
     # This is done for all images, maybe we can pass list or set of images, and make some calculation just once (all pre-calculations)
     def extract_features(self, img): # Should accept more parameters
@@ -23,4 +31,6 @@ class VGG16FeatureExtractor():
     def _calculate_features_of_image(self, img):
         img_data = np.expand_dims(img, axis=0)
         img_data = preprocess_input(img_data)
-        return np.array(self.model.predict(img_data)).flatten()
+        features = self.model.predict(img_data)
+
+        return features[0]

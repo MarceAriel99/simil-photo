@@ -4,6 +4,7 @@ from model_components.model import Model
 from view_components.view import View
 
 from steps import Steps
+import timeit
 
 class Presenter:
     def __init__(self, model: Model, view: View) -> None:
@@ -53,7 +54,18 @@ class Presenter:
         self.view.update_status_label(f"{len(self.clusters)} Groups found!")
         self.view.empty_grid()
 
-        self.add_message_to_queue(("STARTED_STEP", "Done!"))
+        self.end = timeit.default_timer()
+
+        total_time = (self.end - self.start)
+
+        if total_time < 1:
+            time_label = f"Process completed in {int(total_time * 1000)} milisecond" + ("s" if int(total_time * 1000) > 1 else "")
+        elif total_time < 60:
+            time_label = f"Process completed in {int(total_time)} second" + ("s" if int(total_time) > 1 else "")
+        else:
+            time_label = f"Process completed in {int(total_time // 60)} minute" + ("s" if int(total_time // 60) > 1 else "") + f" and {int(total_time % 60)} second" + ("s" if int(total_time % 60) > 1 else "")
+
+        self.add_message_to_queue(("STARTED_STEP", time_label))
         self.add_message_to_queue(("COMPLETED_STEP", 100))
         
         if len(self.clusters) == 0:
@@ -128,6 +140,7 @@ class Presenter:
         self.view.set_path_entry_highlight(False)
         self._apply_config_to_model() 
         self.view.config_panel.progress_bar["value"] = 0
+        self.start = timeit.default_timer()
         self.model.run(self)
 
     def add_message_to_queue(self, message: Steps) -> None:

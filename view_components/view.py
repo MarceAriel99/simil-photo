@@ -15,7 +15,7 @@ class View(tk.Tk):
         super().__init__()
         self.title('SimilPhoto')
         self.minsize(width=800, height=730)
-        self.geometry('1600x680')
+        self.geometry('1610x735')
 
     def init_ui(self, presenter) -> None:
         print("Initializing UI")

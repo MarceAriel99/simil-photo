@@ -5,8 +5,10 @@ from view_components.dynamic_grid import DynamicGrid
 from view_components.config_panel import ConfigPanel
 from view_components.top_bar import TopBar
 
+from ttkthemes import ThemedTk
+
 #TODO: Add a theme to the app
-class View(tk.Tk):
+class View(ThemedTk):
 
     # GUI SETUP
 
@@ -16,22 +18,39 @@ class View(tk.Tk):
         self.title('SimilPhoto')
         self.minsize(width=800, height=730)
         self.geometry('1610x735')
+        style = ttk.Style()
+        style.theme_use('black')
+        self._configure_styles()
+        
+    def _configure_styles(self) -> None:
+        style = ttk.Style()
+        style.configure("TButton", anchor=tk.CENTER)
+        style.configure("TopBarButton.TButton", font=('TkDefaultFont', 14, "bold"))
+        style.configure("TopBarLabel.TLabel", padding=5, font=('TkDefaultFont', 14, "bold"))
+        style.configure("Timages_grid.TFrame", borderwidth=4, relief="solid", bordercolor="#303030")
+        style.configure("ImageCard.TFrame", borderwidth=4, relief="solid", bordercolor="#ffffff")
+        style.configure("Tconfig_panel.TFrame", borderwidth=4, relief="solid", bordercolor="#303030")
+        style.configure("Ttop_bar.TFrame", borderwidth=4, relief="solid", bordercolor="#303030")
+
+        style.configure("TCheckbutton", padding=[5, 0, 5, 0], background="#444444")
+        style.configure("TProgressbar", troughcolor='#303030', background='#4AA72F', bordercolor="black")
+
 
     def init_ui(self, presenter) -> None:
         print("Initializing UI")
-        self.main_frame = tk.Frame(self, padx=10, pady=10)
+        self.main_frame = ttk.Frame(self, style="Tmain_frame.TFrame", padding=10)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.top_bar = TopBar(self.main_frame, self, presenter, padx=10, pady=10)
-        self.images_grid = DynamicGrid(self.main_frame, self, presenter, padx=10, pady=10)
-        self.config_panel = ConfigPanel(self.main_frame, self, presenter)
+        self.top_bar = TopBar(self.main_frame, self, presenter, style="Ttop_bar.TFrame", padding=10)
+        self.images_grid = DynamicGrid(self.main_frame, self, presenter, style="Timages_grid.TFrame", padding=10)
+        self.config_panel = ConfigPanel(self.main_frame, self, presenter, style="Tconfig_panel.TFrame", padding=10)
 
         self.main_frame.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_rowconfigure(1, weight=1)
 
-        self.top_bar.grid(row=0, column=0, sticky="new")
-        self.images_grid.grid(row=1, column=0, sticky="nsew")
-        self.config_panel.grid(row=0, column=1, rowspan=2, sticky="nsew")
+        self.top_bar.grid(row=0, column=0, sticky="new", padx=5, pady=5)
+        self.images_grid.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
+        self.config_panel.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=5, pady=5)
 
         # Initial state
         self.change_group_frame_visibility(False)

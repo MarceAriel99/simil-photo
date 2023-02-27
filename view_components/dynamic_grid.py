@@ -5,12 +5,12 @@ from PIL import ImageTk, Image, ImageOps
 from view_components.image_card import ImageCard
 from view_components.image_square_cropper import crop_square
 
-class DynamicGrid(tk.Frame):
+class DynamicGrid(ttk.Frame):
 
     def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
     
-        self.text = tk.Text(self, wrap="char", borderwidth=0, highlightthickness=0, state="disabled", cursor="arrow")
+        self.text = tk.Text(self, wrap="char", borderwidth=0, highlightthickness=0, state="disabled", cursor="arrow", background="#303030")
         
         self.images = []
         self.window = window
@@ -24,7 +24,7 @@ class DynamicGrid(tk.Frame):
 
     def add_image(self, image_path:str) -> None:
     
-        img_card = ImageCard(self.text, self.window, self.presenter, image_path, bd=1, relief="sunken")
+        img_card = ImageCard(self.text, self.window, self.presenter, image_path, style="ImageCard.TFrame")
 
         self.images.append(img_card)
         

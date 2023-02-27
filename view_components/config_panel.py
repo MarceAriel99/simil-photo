@@ -9,27 +9,29 @@ import json
 from view_components.stoppable_thread import StoppableThread
 from constants import *
 
+from view_components.custom_entry import CustomEntry
+
 #TODO: Include descriptions for configuration options (as tooltips)
 
-class ConfigPanel(tk.Frame):
+class ConfigPanel(ttk.Frame):
 
     def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.presenter = presenter
         self.window = window
         self.processing_thread = None
         self._initialize(presenter)
         
     def _initialize(self, presenter) -> None:
-        self.config_title_label = tk.Label(self, text="Configuration", font=("Arial", 20))
+        self.config_title_label = ttk.Label(self, text="Configuration", font=("Arial", 20))
         self.config_title_label.grid(row=0, column=0, sticky="nw")
-        self.file_search_frame = tk.Frame(self)
+        self.file_search_frame = ttk.Frame(self)
         self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=10)
         ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=10)
-        self.feature_extraction_frame = tk.Frame(self)
+        self.feature_extraction_frame = ttk.Frame(self)
         self.feature_extraction_frame.grid(row=3, column=0, sticky="nsew", pady=10)
         ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=10)
-        self.run_frame = tk.Frame(self)
+        self.run_frame = ttk.Frame(self)
         self.run_frame.grid(row=5, column=0, sticky="nsew", pady=10)
 
         self.load_feature_extraction_methods_descriptions()
@@ -40,29 +42,30 @@ class ConfigPanel(tk.Frame):
 
     def _create_file_search_submenu(self, presenter) -> None:
 
-        self.file_search_title_label = tk.Label(self.file_search_frame, text="File search", font=("Arial", 15, 'bold', 'underline'))
-        self.path_label = tk.Label(self.file_search_frame, text="Searching for images in path:")
-        self.path_entry = tk.Entry(self.file_search_frame, width=50)
-        self.subdirectories_label = tk.Label(self.file_search_frame, text="Include subdirectories")
+        self.file_search_title_label = ttk.Label(self.file_search_frame, text="File search", font=("Arial", 15, 'bold', 'underline'))
+        self.path_label = ttk.Label(self.file_search_frame, text="Searching for images in path:")
+        self.path_entry = CustomEntry(self.file_search_frame, width=50)
+        self.path_entry.set_border_color("#303030")
+        self.subdirectories_label = ttk.Label(self.file_search_frame, text="Include subdirectories")
         self.subdirectories_var = tk.BooleanVar()
-        self.subdirectories_checkbox = tk.Checkbutton(self.file_search_frame, variable=self.subdirectories_var)
-        self.select_folder_button = tk.Button(self.file_search_frame, text="Select folder", width=10)
+        self.subdirectories_checkbox = ttk.Checkbutton(self.file_search_frame, variable=self.subdirectories_var)
+        self.select_folder_button = ttk.Button(self.file_search_frame, text="Select folder", width=10)
         self.select_folder_button.bind("<Button-1>", presenter.handle_select_folder_button_click)
 
-        self.file_types_frame = tk.Frame(self.file_search_frame,)
-        self.file_types_label = tk.Label(self.file_types_frame, text="File types:")
-        self.jpg_label = tk.Label(self.file_types_frame, text="JPG")
+        self.file_types_frame = ttk.Frame(self.file_search_frame,)
+        self.file_types_label = ttk.Label(self.file_types_frame, text="File types:")
+        self.jpg_label = ttk.Label(self.file_types_frame, text="JPG")
         self.jpg_var = tk.BooleanVar()
-        self.jpg_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.jpg_var)
-        self.jpeg_label = tk.Label(self.file_types_frame, text="JPEG")
+        self.jpg_checkbox = ttk.Checkbutton(self.file_types_frame, variable=self.jpg_var)
+        self.jpeg_label = ttk.Label(self.file_types_frame, text="JPEG")
         self.jpeg_var = tk.BooleanVar()
-        self.jpeg_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.jpeg_var)
-        self.png_label = tk.Label(self.file_types_frame, text="PNG")
+        self.jpeg_checkbox = ttk.Checkbutton(self.file_types_frame, variable=self.jpeg_var)
+        self.png_label = ttk.Label(self.file_types_frame, text="PNG")
         self.png_var = tk.BooleanVar()
-        self.png_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.png_var)
-        self.webp_label = tk.Label(self.file_types_frame, text="WEBP")
+        self.png_checkbox = ttk.Checkbutton(self.file_types_frame, variable=self.png_var)
+        self.webp_label = ttk.Label(self.file_types_frame, text="WEBP")
         self.webp_var = tk.BooleanVar()
-        self.webp_checkbox = tk.Checkbutton(self.file_types_frame, variable=self.webp_var)
+        self.webp_checkbox = ttk.Checkbutton(self.file_types_frame, variable=self.webp_var)
         self.file_types_variables = {'jpg': self.jpg_var, 'jpeg': self.jpeg_var, 'png': self.png_var, 'webp': self.webp_var}
 
         self.file_types_label.pack(side=tk.LEFT, padx=(0,10))
@@ -85,25 +88,25 @@ class ConfigPanel(tk.Frame):
 
     def _create_feature_extraction_submenu(self, presenter) -> None:
 
-        self.feature_extraction_title_label = tk.Label(self.feature_extraction_frame, text="Feature extraction", font=("Arial", 15, 'bold', 'underline'))
+        self.feature_extraction_title_label = ttk.Label(self.feature_extraction_frame, text="Feature extraction", font=("Arial", 15, 'bold', 'underline'))
 
-        self.feature_extraction_method_label = tk.Label(self.feature_extraction_frame, text="Feature extraction method:")
+        self.feature_extraction_method_label = ttk.Label(self.feature_extraction_frame, text="Feature extraction method:")
 
         feature_extraction_methods = self.presenter.get_feature_extraction_methods()
         list_items = tk.Variable(value=feature_extraction_methods)
-        self.feature_extraction_listbox = tk.Listbox(self.feature_extraction_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6)
+        self.feature_extraction_listbox = tk.Listbox(self.feature_extraction_frame, listvariable=list_items, selectmode=tk.SINGLE, exportselection=False, width=25, height=6, background="#303030", foreground="#ffffff", selectbackground="#202020", selectforeground="#ffffff", activestyle=tk.NONE, highlightthickness=0, bd=0, relief=tk.FLAT)
         self.feature_extraction_listbox.bind('<<ListboxSelect>>', self._on_feature_extraction_method_selected)
-        self.feature_extraction_textbox = tk.Text(self.feature_extraction_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD)
+        self.feature_extraction_textbox = tk.Text(self.feature_extraction_frame, width=40, height=8, state=tk.DISABLED, wrap=tk.WORD, background="#303030", foreground="#ffffff", relief=tk.FLAT)
 
-        self.feature_cache_recalculate_frame = tk.Frame(self.feature_extraction_frame)
+        self.feature_cache_recalculate_frame = ttk.Frame(self.feature_extraction_frame)
 
-        self.cache_features_label = tk.Label(self.feature_cache_recalculate_frame, text="Cache image features")
+        self.cache_features_label = ttk.Label(self.feature_cache_recalculate_frame, text="Cache image features")
         self.cache_features_var = tk.BooleanVar()
-        self.cache_features_checkbox = tk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.cache_features_var)
+        self.cache_features_checkbox = ttk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.cache_features_var)
 
-        self.force_recalculate_features_label = tk.Label(self.feature_cache_recalculate_frame, text="Force recalculate features")
+        self.force_recalculate_features_label = ttk.Label(self.feature_cache_recalculate_frame, text="Force recalculate features")
         self.force_recalculate_features_var = tk.BooleanVar()
-        self.force_recalculate_features_checkbox = tk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.force_recalculate_features_var)
+        self.force_recalculate_features_checkbox = ttk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.force_recalculate_features_var)
 
         self.feature_extraction_title_label.grid(row=0, column=0, columnspan=2, sticky=tk.W, pady=(0,15))
         self.feature_extraction_method_label.grid(row=1, column=0, columnspan=1, sticky=tk.W)
@@ -120,7 +123,7 @@ class ConfigPanel(tk.Frame):
 
     def _create_run_submenu(self, presenter) -> None:
         
-        self.run_status_label = tk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
+        self.run_status_label = ttk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
         self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10), columnspan=3)
 
         self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1)
@@ -129,7 +132,7 @@ class ConfigPanel(tk.Frame):
         self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
         self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
 
-        self.run_cancel_button = tk.Button(self.run_frame, text="Run", command=self.start_process)
+        self.run_cancel_button = ttk.Button(self.run_frame, text="Run", command=self.start_process)
         self.run_cancel_button.grid(row=3, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
         self.queue = queue.Queue()
         self.periodic_call()
@@ -194,9 +197,11 @@ class ConfigPanel(tk.Frame):
 
     def set_path_entry_highlight(self, highlight:bool=True):
         if highlight:
-            self.path_entry.config(highlightbackground="red", highlightcolor="red", highlightthickness=2)
+            print("Highlighting")
+            self.path_entry.set_border_color("red")
         else:
-            self.path_entry.config(highlightthickness=0)
+            print("Unhighlighting")
+            self.path_entry.set_border_color("#303030")
 
     def select_folder(self) -> str:
         folder_path = os.path.normpath(filedialog.askdirectory())

@@ -138,7 +138,7 @@ class Presenter:
     def handle_run_button_click(self, event=None) -> None:
         
         if not os.path.isdir(self.view.get_images_path()):
-            self.view.set_path_entry_highlight(True)
+            self.view.incorrect_path()
             return
 
         self.view.set_path_entry_highlight(False)

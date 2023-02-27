@@ -17,7 +17,7 @@ class View(ThemedTk):
         super().__init__()
         self.title('SimilPhoto')
         self.minsize(width=800, height=730)
-        self.geometry('1610x735')
+        self.geometry('1630x750')
         style = ttk.Style()
         style.theme_use('black')
         self._configure_styles()
@@ -65,6 +65,10 @@ class View(ThemedTk):
 
     def set_path_entry_highlight(self, highlight:bool) -> None:
         self.config_panel.set_path_entry_highlight(highlight)
+
+    def incorrect_path(self) -> None:
+        self.config_panel.set_path_entry_highlight(True)
+        self.config_panel.update_run_cancel_button("Run", self.config_panel.start_process)
 
     def get_images_path(self) -> str:
         return self.config_panel.get_images_path()

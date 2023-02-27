@@ -126,7 +126,7 @@ class ConfigPanel(ttk.Frame):
         self.run_status_label = ttk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
         self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10), columnspan=3)
 
-        self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1)
+        self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1, )
         self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
 
         self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
@@ -139,8 +139,7 @@ class ConfigPanel(ttk.Frame):
 
     def start_process(self) -> None:
         self.processing_thread = StoppableThread(target=self.presenter.handle_run_button_click)
-        self.run_cancel_button['text'] = "Cancel"
-        self.run_cancel_button['command'] = self.cancel_process
+        self.update_run_cancel_button("Cancel", self.cancel_process)
         self.processing_thread.start()
 
     def cancel_process(self) -> None:
@@ -167,12 +166,15 @@ class ConfigPanel(ttk.Frame):
                 self.progress_bar_ind.start(interval=25)
 
                 if self.progress_bar['value'] >= 100:
-                    self.run_cancel_button['text'] = "Run"
-                    self.run_cancel_button['command'] = self.start_process
+                    self.update_run_cancel_button("Run", self.start_process)
                     self.progress_bar_ind.stop()
                 
             except queue.Empty:
                 pass
+
+    def update_run_cancel_button(self, text:str, command:callable) -> None:
+        self.run_cancel_button['text'] = text
+        self.run_cancel_button['command'] = command
 
     def select_feature_extraction_method(self, method:str) -> None:
         self.feature_extraction_listbox.select_set(method)
@@ -197,10 +199,8 @@ class ConfigPanel(ttk.Frame):
 
     def set_path_entry_highlight(self, highlight:bool=True):
         if highlight:
-            print("Highlighting")
             self.path_entry.set_border_color("red")
         else:
-            print("Unhighlighting")
             self.path_entry.set_border_color("#303030")
 
     def select_folder(self) -> str:

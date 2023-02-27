@@ -1,19 +1,26 @@
 import tkinter as tk
+from tkinter import ttk
 from PIL import ImageTk, Image, ImageOps
 
 from view_components.image_card import ImageCard
 from view_components.image_square_cropper import crop_square
 
-# TODO: Add scrollbar on the right
 class DynamicGrid(tk.Frame):
 
     def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
         tk.Frame.__init__(self, parent, *args, **kwargs)
+    
         self.text = tk.Text(self, wrap="char", borderwidth=0, highlightthickness=0, state="disabled", cursor="arrow")
-        self.text.pack(fill="both", expand=True)
+        
         self.images = []
         self.window = window
         self.presenter = presenter
+        
+        scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.text.yview, takefocus=False)
+        self.text['yscrollcommand'] = scrollbar.set
+
+        scrollbar.pack(side="right", fill="y", expand=False, padx=5)
+        self.text.pack(side="right", fill="both", expand=True)
 
     def add_image(self, image_path:str) -> None:
     

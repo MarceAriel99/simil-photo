@@ -48,7 +48,7 @@ class Presenter:
         self._update_view_with_saved_data()
         self.view.mainloop()
 
-    def run_completed(self) -> None:
+    def run_completed(self, stopped:bool=False) -> None:
         self.current_cluster = 0
         self.clusters = self.model.get_clusters_paths()
         self.view.update_status_label(f"{len(self.clusters)} Groups found!")
@@ -65,7 +65,11 @@ class Presenter:
         else:
             time_label = f"Process completed in {int(total_time // 60)} minute" + ("s" if int(total_time // 60) > 1 else "") + f" and {int(total_time % 60)} second" + ("s" if int(total_time % 60) > 1 else "")
 
-        self.add_message_to_queue(("STARTED_STEP", time_label))
+        if stopped:
+            self.add_message_to_queue(("STARTED_STEP", "Process stopped!"))
+        else:
+            self.add_message_to_queue(("STARTED_STEP", time_label))
+            
         self.add_message_to_queue(("COMPLETED_STEP", 100))
         
         if len(self.clusters) == 0:

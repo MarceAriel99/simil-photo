@@ -11,6 +11,8 @@ from feature_extractors.color_histogram_extractor import ColorHistogramFeatureEx
 from feature_extractors.vgg16_extractor import VGG16FeatureExtractor
 from feature_extractors.mobilenet_extractor import MobileNetFeatureExtractor
 
+from view_components.stoppable_thread import StoppableThread
+
 class SimilarityCalculator():
 
     def __init__(self, images_pixel_data:dict[int,np.array]={}, images_cached_features:dict[int,np.array]={}, feature_extraction_method:str='vgg16', clustering_method:str='affinity_propagation') -> None:
@@ -41,13 +43,15 @@ class SimilarityCalculator():
     def get_normalized_features(self) -> dict[int, np.ndarray]:
         return self.image_features
 
-    def run_feature_calculation(self) -> None:
+    def run_feature_calculation(self, thread:StoppableThread) -> None:
                 
         # Extract features
-        extracted_features = self._extract_features(self.images_pixel_data)
+        extracted_features = self._extract_features(self.images_pixel_data, thread)
 
         # Normalize features
         self.image_features.update(self._normalize_features(extracted_features))
+
+        if self.image_features == {}: return # If there are no features to calculate similarity, return
 
         # Calculate similarity matrix
         self.similarity_matrix = self._calculate_similarity_matrix(self.image_features)
@@ -62,7 +66,7 @@ class SimilarityCalculator():
 
         return self.image_clusters
     
-    def _extract_features(self, images_pixel_data: dict[int, np.array]) -> dict[int, np.ndarray]:
+    def _extract_features(self, images_pixel_data: dict[int, np.array], thread:StoppableThread) -> dict[int, np.ndarray]:
 
         if not images_pixel_data: return {} # If there are no images to extract features from, return an empty dictionary
             
@@ -78,6 +82,10 @@ class SimilarityCalculator():
 
         images_features = {}
         for (image_id, img) in images_pixel_data.items():
+            
+            if thread.stopped():
+                return {}
+
             images_features[image_id] = feature_extractor.extract_features(img)
 
         return images_features

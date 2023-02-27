@@ -4,9 +4,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 
-import threading
 import json
 
+from view_components.stoppable_thread import StoppableThread
 from constants import *
 
 #TODO: Include descriptions for configuration options (as tooltips)
@@ -17,6 +17,7 @@ class ConfigPanel(tk.Frame):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.presenter = presenter
         self.window = window
+        self.processing_thread = None
         self._initialize(presenter)
         
     def _initialize(self, presenter) -> None:
@@ -120,7 +121,7 @@ class ConfigPanel(tk.Frame):
     def _create_run_submenu(self, presenter) -> None:
         
         self.run_status_label = tk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
-        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10))
+        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10), columnspan=3)
 
         self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1)
         self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
@@ -128,12 +129,21 @@ class ConfigPanel(tk.Frame):
         self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
         self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
 
-        #TODO: Add a cancel button
-
-        self.run_button = tk.Button(self.run_frame, text="Run", command= lambda: threading.Thread(target=self.presenter.handle_run_button_click).start() )
-        self.run_button.grid(row=3, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
+        self.run_cancel_button = tk.Button(self.run_frame, text="Run", command=self.start_process)
+        self.run_cancel_button.grid(row=3, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
         self.queue = queue.Queue()
         self.periodic_call()
+
+    def start_process(self) -> None:
+        self.processing_thread = StoppableThread(target=self.presenter.handle_run_button_click)
+        self.run_cancel_button['text'] = "Cancel"
+        self.run_cancel_button['command'] = self.cancel_process
+        self.processing_thread.start()
+
+    def cancel_process(self) -> None:
+        self.run_status_label['text'] = "Stopping..."
+        print("Stopping...")
+        self.processing_thread.stop()
 
     def periodic_call(self) -> None:
         """ Check every 100 ms if there is something new in the queue. """
@@ -154,6 +164,8 @@ class ConfigPanel(tk.Frame):
                 self.progress_bar_ind.start(interval=25)
 
                 if self.progress_bar['value'] >= 100:
+                    self.run_cancel_button['text'] = "Run"
+                    self.run_cancel_button['command'] = self.start_process
                     self.progress_bar_ind.stop()
                 
             except queue.Empty:

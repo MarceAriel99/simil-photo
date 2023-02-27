@@ -10,6 +10,8 @@ import numpy as np
 import keras.utils as image
 import cv2
 
+from view_components.stoppable_thread import StoppableThread, current_thread
+
 from steps import Steps
 from constants import *
 
@@ -133,6 +135,8 @@ class Model:
 
     def run(self, presenter) -> None:
 
+        thread = current_thread()
+
         self.images_ids_paths = {}
         self.images_clusters = []
 
@@ -178,8 +182,15 @@ class Model:
 
         images_pixel_data = {}
         for (image_id, image_path) in self.images_ids_paths.items():
+
+            # Check if thread was stopped while loading images
+            if thread.stopped():
+                presenter.run_completed(True)
+                return
+            
             if image_id in images_cached_features:
                 continue
+
             img = image.load_img(image_path, target_size=(224, 224))
             img_data = image.img_to_array(img)
             images_pixel_data[image_id] = img_data
@@ -196,18 +207,32 @@ class Model:
         
         # Run similarity calculator
         presenter.step_started(Steps.calculate_features)
-        similarity_calculator.run_feature_calculation()
-        presenter.step_completed(Steps.calculate_features)
 
+        similarity_calculator.run_feature_calculation(thread)
+
+        # Check if thread was stopped while calculating features
+        if thread.stopped():
+            presenter.run_completed(True)
+            return
+
+        presenter.step_completed(Steps.calculate_features)
         presenter.step_started(Steps.calculate_clusters)
+        
         self.images_clusters = similarity_calculator.run_cluster_calculation()
         presenter.step_completed(Steps.calculate_clusters)
+
+        # Check if thread was stopped while calculating clusters
+        if thread.stopped():
+            self.images_clusters = []
+            presenter.run_completed(True)
+            return
         
         # Save features to cache file
         # If at least one image was loaded and the features need to be saved
         if self.save_calculated_features and len(images_pixel_data) > 0:
             print("Saving calculated features to cache file")
             presenter.step_started(Steps.cache_features)
+        
             self.cached_features_method = self.selected_feature_extraction_method
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():

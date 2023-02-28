@@ -95,17 +95,17 @@ class Presenter:
     def step_started(self, step: Steps) -> None:
 
         if step == Steps.search_images:
-            self.add_message_to_queue(("STARTED_STEP", "Searching images..."))
+            self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.load_cached_features:
-            self.add_message_to_queue(("STARTED_STEP", "Loading cached features..."))
+            self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.load_images:
-            self.add_message_to_queue(("STARTED_STEP", "Loading images..."))
+            self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.calculate_features:
-            self.add_message_to_queue(("STARTED_STEP", "Calculating features..."))
+            self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.calculate_clusters:
-            self.add_message_to_queue(("STARTED_STEP", "Calculating clusters..."))
+            self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.cache_features:
-            self.add_message_to_queue(("STARTED_STEP", "Caching features..."))
+            self.add_message_to_queue(("STARTED_STEP", step))
 
     # This method is called by the Model when it finishes a step of the process
     def step_completed(self, step: Steps) -> None:
@@ -122,6 +122,9 @@ class Presenter:
             self.add_message_to_queue(("COMPLETED_STEP", 80))
         elif step == Steps.cache_features:
             self.add_message_to_queue(("COMPLETED_STEP", 95))
+
+    def step_progress(self, features_extracted: int, total_features: int, step) -> None:
+        self.add_message_to_queue(("STEP_PROGRESS", f"{step} ({features_extracted} / {total_features})"))
 
     # Changes the group that is being displayed to the next one
     def handle_next_group_button_click(self, event=None) -> None:

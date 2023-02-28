@@ -27,13 +27,13 @@ class ConfigPanel(ttk.Frame):
         
     def _initialize(self, presenter) -> None:
         self.config_title_label = ttk.Label(self, text="Configuration", font=("Arial", 20))
-        self.config_title_label.grid(row=0, column=0, sticky="nw")
+        self.config_title_label.grid(row=0, column=0, sticky="nw", pady=(0, 10))
         self.file_search_frame = ttk.Frame(self)
         self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=10)
-        ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=10)
+        ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=30)
         self.feature_extraction_frame = ttk.Frame(self)
         self.feature_extraction_frame.grid(row=3, column=0, sticky="nsew", pady=10)
-        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=10)
+        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=30)
         self.run_frame = ttk.Frame(self)
         self.run_frame.grid(row=5, column=0, sticky="nsew", pady=10)
 
@@ -135,13 +135,13 @@ class ConfigPanel(ttk.Frame):
         self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10), columnspan=3)
 
         self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1, )
-        self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
+        self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(10,5))
 
         self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
-        self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(10,10))
+        self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(5,5))
 
         self.run_cancel_button = ttk.Button(self.run_frame, text="Run", command=self.start_process)
-        self.run_cancel_button.grid(row=3, column=2, sticky=tk.E, pady=(15,15), ipadx=15, ipady=2)
+        self.run_cancel_button.grid(row=3, column=2, sticky=tk.E, pady=(10,15), ipadx=15, ipady=2)
         self.queue = queue.Queue()
         self.periodic_call()
 
@@ -170,6 +170,8 @@ class ConfigPanel(ttk.Frame):
                     self.update_run_status_label(msg[1])
                 elif msg[0] == "COMPLETED_STEP":
                     self.progress_bar['value'] = msg[1]
+                elif msg[0] == "STEP_PROGRESS":
+                    self.update_run_status_label(msg[1])
 
                 self.progress_bar_ind.start(interval=25)
 

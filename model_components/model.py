@@ -136,11 +136,12 @@ class Model:
         
         # Get current thread
         thread = current_thread()
+        self.presenter = presenter
 
         self.images_ids_paths = {}
         self.images_clusters = []
 
-        presenter.step_started(Steps.search_images)
+        self.presenter.step_started(Steps.search_images)
 
         # Search for images in path (POSSIBLE UPGRADE give option to search in a group of folders)
         print(f"Searching for images in {self.images_path} with file types ({self.selected_file_types})")
@@ -149,7 +150,7 @@ class Model:
         # If no images were found, stop the execution
         if len(images_names_paths) == 0:
             print(f"No images found in the specified path with file types ({self.selected_file_types})")
-            presenter.run_completed()
+            self.presenter.run_completed()
             return
 
         # Create dictionary with {id: path} pairs
@@ -158,7 +159,7 @@ class Model:
 
         print("Walk completed")
 
-        presenter.step_completed(Steps.search_images)
+        self.presenter.step_completed(Steps.search_images)
 
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
@@ -173,20 +174,20 @@ class Model:
             print("Forcing recalculation of features")
             images_cached_features = {}       
         else:
-            presenter.step_started(Steps.load_cached_features)
+            self.presenter.step_started(Steps.load_cached_features)
             images_cached_features = cached_features_file_manager.load_cached_features(self.images_ids_paths, self.cache_file_path)
-            presenter.step_completed(Steps.load_cached_features)
+            self.presenter.step_completed(Steps.load_cached_features)
 
         # Load images
         # images_pixel_data is a dict with {id: pixel_data} pairs (without cached features)
-        presenter.step_started(Steps.load_images)
+        self.presenter.step_started(Steps.load_images)
 
         images_pixel_data = {}
         for (image_id, image_path) in self.images_ids_paths.items():
 
             # Check if thread was stopped while loading images
             if thread.stopped():
-                presenter.run_completed(True)
+                self.presenter.run_completed(True)
                 return
             
             if image_id in images_cached_features:
@@ -195,8 +196,9 @@ class Model:
             img = image.load_img(image_path, target_size=(224, 224))
             img_data = image.img_to_array(img)
             images_pixel_data[image_id] = img_data
+            self.step_progress(Steps.load_images, len(images_pixel_data), len(self.images_ids_paths))
 
-        presenter.step_completed(Steps.load_images)
+        self.presenter.step_completed(Steps.load_images)
 
         print(f"{len(images_pixel_data)} images loaded")
         print(f"{len(images_cached_features)} images did not need to be loaded")
@@ -207,32 +209,32 @@ class Model:
         similarity_calculator.set_feature_extraction_parameters(self.feature_extraction_parameters)
         
         # Run similarity calculator
-        presenter.step_started(Steps.calculate_features)
+        self.presenter.step_started(Steps.calculate_features)
 
-        similarity_calculator.run_feature_calculation(thread)
+        similarity_calculator.run_feature_calculation(thread, self.step_progress)
 
         # Check if thread was stopped while calculating features
         if thread.stopped():
-            presenter.run_completed(True)
+            self.presenter.run_completed(True)
             return
 
-        presenter.step_completed(Steps.calculate_features)
-        presenter.step_started(Steps.calculate_clusters)
+        self.presenter.step_completed(Steps.calculate_features)
+        self.presenter.step_started(Steps.calculate_clusters)
         
         self.images_clusters = similarity_calculator.run_cluster_calculation()
-        presenter.step_completed(Steps.calculate_clusters)
+        self.presenter.step_completed(Steps.calculate_clusters)
 
         # Check if thread was stopped while calculating clusters
         if thread.stopped():
             self.images_clusters = []
-            presenter.run_completed(True)
+            self.presenter.run_completed(True)
             return
         
         # Save features to cache file
         # If the user has selected to save the calculated features, and there are images to save
         if self.save_calculated_features and len(images_pixel_data) > 0:
             print("Saving calculated features to cache file")
-            presenter.step_started(Steps.cache_features)
+            self.presenter.step_started(Steps.cache_features)
         
             self.cached_features_method = self.selected_feature_extraction_method
             images_paths_features:dict[str,np.array] = {}
@@ -240,13 +242,13 @@ class Model:
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features
             
             cached_features_file_manager.save_cached_features(images_paths_features, self.cache_file_path, feature_extraction_method_changed)
-            presenter.step_completed(Steps.cache_features)
+            self.presenter.step_completed(Steps.cache_features)
 
         # Filter clusters with only one image
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
 
         # Call presenter to show results
-        presenter.run_completed()
+        self.presenter.run_completed()
     
     # Return a list of clusters, each cluster is a list of image paths
     def get_clusters_paths(self) -> list[list[str]]:
@@ -260,3 +262,6 @@ class Model:
             result.append(cluster_paths)
 
         return result
+    
+    def step_progress(self, current_step:Steps, features_extracted:int, total_features:int) -> None:
+        self.presenter.step_progress(features_extracted, total_features, current_step)

@@ -1,9 +1,9 @@
 from enum import Enum
 
-class Steps(Enum):
-    search_images = 0
-    load_cached_features = 1
-    load_images = 2
-    calculate_features = 3
-    calculate_clusters = 4
-    cache_features = 5
+class Steps(str, Enum):
+    search_images = "Searching images..."
+    load_cached_features = "Loading cached features..."
+    load_images = "Loading images..."
+    calculate_features = "Calculating features..."
+    calculate_clusters = "Calculating clusters..."
+    cache_features = "Caching features..."

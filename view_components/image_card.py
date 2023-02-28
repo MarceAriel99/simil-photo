@@ -8,6 +8,10 @@ import view_components.tooltip as tooltip
 
 from constants import *
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from presenter_components.presenter import Presenter
+
 class ImageCard(ttk.Frame):
 
     def __init__(self, parent, window, presenter, path, *args, **kwargs) -> None:
@@ -18,7 +22,7 @@ class ImageCard(ttk.Frame):
         self.grid = parent
         self._initialize(presenter)
         
-    def _initialize(self, presenter) -> None:
+    def _initialize(self, presenter:Presenter) -> None:
         
         # Title
         self.title_label = ttk.Label(self)

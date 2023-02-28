@@ -1,15 +1,19 @@
 import tkinter as tk
 from tkinter import ttk
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from presenter_components.presenter import Presenter
+
 class TopBar(ttk.Frame):
 
-    def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
+    def __init__(self, parent, window, presenter:Presenter, *args, **kwargs) -> None:
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.presenter = presenter
         self.window = window
         self._initialize(presenter)
         
-    def _initialize(self, presenter) -> None:
+    def _initialize(self, presenter:Presenter) -> None:
         self.status_label = ttk.Label(self, text="", font=('TkDefaultFont', 16, "bold"))
         self.status_label.pack(side=tk.LEFT)
 

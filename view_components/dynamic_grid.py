@@ -5,9 +5,13 @@ from PIL import ImageTk, Image, ImageOps
 from view_components.image_card import ImageCard
 from view_components.image_square_cropper import crop_square
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from presenter_components.presenter import Presenter
+
 class DynamicGrid(ttk.Frame):
 
-    def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
+    def __init__(self, parent, window, presenter:Presenter, *args, **kwargs) -> None:
         ttk.Frame.__init__(self, parent, *args, **kwargs)
     
         self.text = tk.Text(self, wrap="char", borderwidth=0, highlightthickness=0, state="disabled", cursor="arrow", background="#303030")

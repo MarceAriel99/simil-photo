@@ -1,3 +1,4 @@
+from __future__ import annotations
 import sys
 
 import numpy as np
@@ -14,6 +15,10 @@ from view_components.stoppable_thread import StoppableThread, current_thread
 
 from steps import Steps
 from constants import *
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from presenter_components.presenter import Presenter
 
 # TODO: add logging
 class Model:
@@ -132,7 +137,7 @@ class Model:
     def get_force_recalculate_features(self) -> bool:
         return self.force_recalculate_features
 
-    def run(self, presenter) -> None:
+    def run(self, presenter:Presenter) -> None:
         
         # Get current thread
         thread = current_thread()

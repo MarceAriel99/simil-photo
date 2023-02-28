@@ -13,19 +13,23 @@ from view_components.custom_entry import CustomEntry
 
 import view_components.tooltip as tooltip
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from presenter_components.presenter import Presenter
+
 '''
 This class represents the configuration panel on the right side of the main window.
 '''
 class ConfigPanel(ttk.Frame):
 
-    def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
+    def __init__(self, parent, window, presenter:Presenter, *args, **kwargs) -> None:
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.presenter = presenter
         self.window = window
         self.processing_thread = None
         self._initialize(presenter)
         
-    def _initialize(self, presenter) -> None:
+    def _initialize(self, presenter:Presenter) -> None:
         self.config_title_label = ttk.Label(self, text="Configuration", font=("Arial", 20))
         self.config_title_label.grid(row=0, column=0, sticky="nw", pady=(0, 10))
         self.file_search_frame = ttk.Frame(self)
@@ -43,7 +47,7 @@ class ConfigPanel(ttk.Frame):
         self._create_feature_extraction_submenu(presenter)
         self._create_run_submenu(presenter)
 
-    def _create_file_search_submenu(self, presenter) -> None:
+    def _create_file_search_submenu(self, presenter:Presenter) -> None:
 
         self.file_search_title_label = ttk.Label(self.file_search_frame, text="File search", font=("Arial", 15, 'bold', 'underline'))
         self.path_label = ttk.Label(self.file_search_frame, text="Searching for images in path:")
@@ -92,7 +96,7 @@ class ConfigPanel(ttk.Frame):
         self.select_folder_button.grid(row=2, column=2, sticky=tk.E, pady=5)
         self.file_types_frame.grid(row=3, column=0, columnspan=3, sticky=tk.W, pady=(5,0))
 
-    def _create_feature_extraction_submenu(self, presenter) -> None:
+    def _create_feature_extraction_submenu(self, presenter:Presenter) -> None:
 
         self.feature_extraction_title_label = ttk.Label(self.feature_extraction_frame, text="Feature extraction", font=("Arial", 15, 'bold', 'underline'))
 
@@ -129,7 +133,7 @@ class ConfigPanel(ttk.Frame):
 
         # POSSIBLE UPGRADE: Make a second listbox for choosing the parameters of the selected feature extraction method
 
-    def _create_run_submenu(self, presenter) -> None:
+    def _create_run_submenu(self, presenter:Presenter) -> None:
         
         self.run_status_label = ttk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
         self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10), columnspan=3)

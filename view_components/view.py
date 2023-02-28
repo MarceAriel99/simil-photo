@@ -7,6 +7,10 @@ from view_components.top_bar import TopBar
 
 from ttkthemes import ThemedTk
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from presenter_components.presenter import Presenter
+
 class View(ThemedTk):
 
     # GUI SETUP
@@ -36,7 +40,7 @@ class View(ThemedTk):
         style.configure("TProgressbar", troughcolor='#303030', background='#4AA72F', bordercolor="black")
 
 
-    def init_ui(self, presenter) -> None:
+    def init_ui(self, presenter:Presenter) -> None:
         print("Initializing UI")
         self.main_frame = ttk.Frame(self, style="Tmain_frame.TFrame", padding=10)
         self.main_frame.pack(fill=tk.BOTH, expand=True)

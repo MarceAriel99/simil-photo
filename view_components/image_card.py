@@ -90,5 +90,6 @@ class ImageCard(ttk.Frame):
         self.open_button.grid(row=5, column=1, sticky=tk.E, padx=(0,5), pady=(2,8))
     
     def handle_delete_button_click(self, path:str) -> None:
-        self.presenter.handle_delete_button_click(path)
-        self.destroy()
+        if tk.messagebox.askokcancel("Delete file", "Are you sure you want to delete this file?"):
+            self.presenter.handle_delete_button_click(path)
+            self.destroy()

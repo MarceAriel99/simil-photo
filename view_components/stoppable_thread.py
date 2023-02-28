@@ -7,9 +7,11 @@ class StoppableThread(threading.Thread):
     def __init__(self,  *args, **kwargs):
         super(StoppableThread, self).__init__(*args, **kwargs)
         self._stop_event = threading.Event()
+        self.close_window = False
 
-    def stop(self):
+    def stop(self, close_window:bool = False):
         self._stop_event.set()
+        self.close_window = close_window
 
     def stopped(self):
         return self._stop_event.is_set()

@@ -187,7 +187,8 @@ class Model:
 
             # Check if thread was stopped while loading images
             if thread.stopped():
-                self.presenter.run_completed(True)
+                if not thread.close_window:
+                    self.presenter.run_completed(True)
                 return
             
             if image_id in images_cached_features:
@@ -215,7 +216,8 @@ class Model:
 
         # Check if thread was stopped while calculating features
         if thread.stopped():
-            self.presenter.run_completed(True)
+            if not thread.close_window:
+                self.presenter.run_completed(True)
             return
 
         self.presenter.step_completed(Steps.calculate_features)
@@ -227,7 +229,8 @@ class Model:
         # Check if thread was stopped while calculating clusters
         if thread.stopped():
             self.images_clusters = []
-            self.presenter.run_completed(True)
+            if not thread.close_window:
+                self.presenter.run_completed(True)
             return
         
         # Save features to cache file

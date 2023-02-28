@@ -20,6 +20,7 @@ class View(ThemedTk):
         style = ttk.Style()
         style.theme_use('black')
         self._configure_styles()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         
     def _configure_styles(self) -> None:
         style = ttk.Style()
@@ -120,3 +121,14 @@ class View(ThemedTk):
 
     def previous_button_state(self, state:str="normal") -> None:
         self.top_bar.left_arrow_button.configure(state=state)
+
+    def on_closing(self):
+        try:
+            print("Stopping...")
+            self.config_panel.processing_thread.stop(True)
+            self.config_panel.processing_thread.join()
+        except AttributeError:
+            print("No processing thread to stop")
+            pass
+        print("Destroying window...")
+        self.destroy()

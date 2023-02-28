@@ -13,6 +13,9 @@ from view_components.custom_entry import CustomEntry
 
 import view_components.tooltip as tooltip
 
+'''
+This class represents the configuration panel on the right side of the main window.
+'''
 class ConfigPanel(ttk.Frame):
 
     def __init__(self, parent, window, presenter, *args, **kwargs) -> None:
@@ -176,7 +179,7 @@ class ConfigPanel(ttk.Frame):
                 
             except queue.Empty:
                 pass
-
+    
     def update_run_cancel_button(self, text:str, command:callable) -> None:
         self.run_cancel_button['text'] = text
         self.run_cancel_button['command'] = command

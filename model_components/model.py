@@ -15,10 +15,7 @@ from view_components.stoppable_thread import StoppableThread, current_thread
 from steps import Steps
 from constants import *
 
-# TODO: add exception checks everywhere
 # TODO: add logging
-# TODO: add comments
-
 class Model:
     def __init__(self) -> None:
         # Set default parameters, some of them will be updated with the config file if it exists
@@ -42,6 +39,7 @@ class Model:
         self._read_config_file()
         print("Model created")
 
+    # Read the config file and update the parameters
     def _read_config_file(self) -> None: 
         images_path_in_file = self.configFileManager.get_config_parameter(CONFIG_SECTION_PATHS, CONFIG_PARAMETER_IMAGES_PATH)
         self.images_path = images_path_in_file if images_path_in_file != '' else self.images_path
@@ -63,6 +61,7 @@ class Model:
 
         self.check_subdirectories = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_MISC, CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES) == 'True' else False     
 
+    # Update the config file with the current parameters
     def update_config_file(self) -> None:
         config_parameters = {}
         
@@ -134,7 +133,8 @@ class Model:
         return self.force_recalculate_features
 
     def run(self, presenter) -> None:
-
+        
+        # Get current thread
         thread = current_thread()
 
         self.images_ids_paths = {}
@@ -142,17 +142,17 @@ class Model:
 
         presenter.step_started(Steps.search_images)
 
-        # Search for images in path
-        # POSSIBLE UPGRADE give option to search in a group of folders
+        # Search for images in path (POSSIBLE UPGRADE give option to search in a group of folders)
         print(f"Searching for images in {self.images_path} with file types ({self.selected_file_types})")
         images_names_paths = file_searcher.file_search(self.images_path, tuple(self.selected_file_types), self.check_subdirectories)
 
+        # If no images were found, stop the execution
         if len(images_names_paths) == 0:
             print(f"No images found in the specified path with file types ({self.selected_file_types})")
             presenter.run_completed()
             return
 
-        # Create dictionary
+        # Create dictionary with {id: path} pairs
         for (index, (image_name, image_path)) in enumerate(images_names_paths.items()):
             self.images_ids_paths[index] = f"{image_path}\\{image_name}"
 
@@ -167,6 +167,7 @@ class Model:
         # (Currently it doesn't make sense because the user cannot change the parameters)
         print(f"Selected feature extraction method: {self.selected_feature_extraction_method}")
         print(f"File saved feature extraction method: {self.configFileManager.get_config_parameter('cache', 'method')}")
+
         feature_extraction_method_changed:bool = self.selected_feature_extraction_method != self.configFileManager.get_config_parameter('cache', 'method')
         if self.force_recalculate_features or feature_extraction_method_changed:
             print("Forcing recalculation of features")
@@ -228,7 +229,7 @@ class Model:
             return
         
         # Save features to cache file
-        # If at least one image was loaded and the features need to be saved
+        # If the user has selected to save the calculated features, and there are images to save
         if self.save_calculated_features and len(images_pixel_data) > 0:
             print("Saving calculated features to cache file")
             presenter.step_started(Steps.cache_features)
@@ -244,8 +245,10 @@ class Model:
         # Filter clusters with only one image
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
 
+        # Call presenter to show results
         presenter.run_completed()
     
+    # Return a list of clusters, each cluster is a list of image paths
     def get_clusters_paths(self) -> list[list[str]]:
 
         result = []

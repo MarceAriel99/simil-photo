@@ -1,6 +1,10 @@
 import configparser
 from constants import *
 
+'''
+This class is responsible for reading and writing the config file.
+It also provides methods for getting and setting config parameters.
+'''
 class ConfigFileManager:
 
     def __init__(self) -> None:

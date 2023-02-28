@@ -13,6 +13,10 @@ from feature_extractors.mobilenet_extractor import MobileNetFeatureExtractor
 
 from view_components.stoppable_thread import StoppableThread
 
+'''
+This calculates the similarity between images using the extracted features and clusters them using affinity propagation
+The method used to extract features can be changed by setting the feature_extraction_method attribute
+'''
 class SimilarityCalculator():
 
     def __init__(self, images_pixel_data:dict[int,np.array]={}, images_cached_features:dict[int,np.array]={}, feature_extraction_method:str='vgg16', clustering_method:str='affinity_propagation') -> None:
@@ -20,6 +24,7 @@ class SimilarityCalculator():
         self.feature_extraction_method = feature_extraction_method # Could be 'color_histogram', 'vgg16', 'vgg19', 'resnet50'... Implement more methods
 
         #POSSIBLE UPGRADE: Change this to a class 'ClusteringCalculator' or interface because implementing more methods will make this class too big
+        # This would make sense if more clustering methods are implemented
         self.clustering_method = clustering_method # Could be 'affinity_propagation', 'kmeans', 'dbscan'... Implement more methods
 
         self.images_pixel_data = images_pixel_data # Dictionary with {id: data} pairs
@@ -83,6 +88,7 @@ class SimilarityCalculator():
         images_features = {}
         for (image_id, img) in images_pixel_data.items():
             
+            # If the thread is stopped, stop the feature extraction and return an empty dictionary
             if thread.stopped():
                 return {}
 
@@ -139,9 +145,6 @@ class SimilarityCalculator():
 
             #Get the id of the image that is closest to the center
             most_central_image_id = cluster[most_central_image_index]
-
-            #print(f"All cluster images: {cluster}")
-            #print(f"Cluster center image id: {most_central_image_id}")
 
             cluster_centers.append(most_central_image_id)
 

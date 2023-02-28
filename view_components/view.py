@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -6,6 +8,8 @@ from view_components.config_panel import ConfigPanel
 from view_components.top_bar import TopBar
 
 from ttkthemes import ThemedTk
+
+import logging
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -16,7 +20,6 @@ class View(ThemedTk):
     # GUI SETUP
 
     def __init__(self) -> None:
-        print("View created")
         super().__init__()
         self.title('SimilPhoto')
         self.minsize(width=800, height=730)
@@ -25,6 +28,7 @@ class View(ThemedTk):
         style.theme_use('black')
         self._configure_styles()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        logging.debug("View created")
         
     def _configure_styles(self) -> None:
         style = ttk.Style()
@@ -41,7 +45,8 @@ class View(ThemedTk):
 
 
     def init_ui(self, presenter:Presenter) -> None:
-        print("Initializing UI")
+        logging.debug("Initializing UI")
+        self.presenter = presenter
         self.main_frame = ttk.Frame(self, style="Tmain_frame.TFrame", padding=10)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -127,12 +132,13 @@ class View(ThemedTk):
         self.top_bar.left_arrow_button.configure(state=state)
 
     def on_closing(self):
+        self.presenter.update_config_file_with_selected_parameters()
         try:
-            print("Stopping...")
+            logging.debug("Stopping processing thread...")
             self.config_panel.processing_thread.stop(True)
             self.config_panel.processing_thread.join()
         except AttributeError:
-            print("No processing thread to stop")
+            logging.debug("No processing thread to stop")
             pass
-        print("Destroying window...")
+        logging.debug("Destroying window...")
         self.destroy()

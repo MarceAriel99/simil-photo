@@ -1,6 +1,7 @@
 import csv
 import os
 import numpy as np
+import logging
 from constants import PATH_TEMP_FILE
 
 
@@ -24,9 +25,9 @@ def load_cached_features(images_ids_paths:dict[int, str], file_path:str) -> dict
                 image_id = list(images_ids_paths.keys())[list(images_ids_paths.values()).index(image_path)]
                 cached_features[image_id] = image_features
     except FileNotFoundError:
-        print('Cached features file not found')
+        logging.warning('Cached features file not found')
     except Exception as e:
-        print(e)
+        logging.error(e)
 
     return cached_features
 
@@ -38,8 +39,8 @@ If force_overwrite is enabled, it will overwrite all the cached features, otherw
 '''
 def save_cached_features(images_paths_features:dict[str, np.array], file_path:str, force_overwrite:bool = False) -> None:
 
-    if force_overwrite: print("Force overwrite is enabled, this will overwrite all the cached features")
-
+    if force_overwrite: logging.warning("Force overwrite is enabled, this will overwrite all the cached features")
+    
     # This writes the features that are already in the file to the temporary file. If the path is in the dict, then it will override it
     try:
         with open(file_path, 'r', newline='') as csvfile, open(PATH_TEMP_FILE, 'w', newline='') as tempfile:
@@ -55,9 +56,9 @@ def save_cached_features(images_paths_features:dict[str, np.array], file_path:st
                 else: #If the path in the file is not in the dict, then just copy it
                     writer.writerow(row)
     except FileNotFoundError:
-        print('Cached features file not found')
+        logging.warning('Cached features file not found')
     except Exception as e:
-        print(e)
+        logging.error(e)
 
     # This writes the remaining features to the temporary file (the ones that were not in the original cache file)
     with open(PATH_TEMP_FILE, 'a', newline='') as tempfile:
@@ -71,6 +72,6 @@ def save_cached_features(images_paths_features:dict[str, np.array], file_path:st
     try:
         os.remove(file_path)
     except Exception as e:
-        print(e)
+        logging.error(e)
 
     os.rename(PATH_TEMP_FILE, file_path)

@@ -1,5 +1,7 @@
 from __future__ import annotations
-import sys
+
+import logging
+logging.basicConfig(filename='run.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s')
 
 import numpy as np
 from file_managers.config_file_manager import ConfigFileManager
@@ -9,7 +11,6 @@ from model_components.similarity_calculator import SimilarityCalculator
 
 import numpy as np
 import keras.utils as image
-import cv2
 
 from view_components.stoppable_thread import StoppableThread, current_thread
 
@@ -20,7 +21,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from presenter_components.presenter import Presenter
 
-# TODO: add logging
 class Model:
     def __init__(self) -> None:
         # Set default parameters, some of them will be updated with the config file if it exists
@@ -42,7 +42,7 @@ class Model:
 
         self.configFileManager = ConfigFileManager()
         self._read_config_file()
-        print("Model created")
+        logging.debug('Model initialized')
 
     # Read the config file and update the parameters
     def _read_config_file(self) -> None: 
@@ -138,9 +138,11 @@ class Model:
         return self.force_recalculate_features
 
     def run(self, presenter:Presenter) -> None:
+
+        logging.info("Starting execution")
         
         # Get current thread
-        thread = current_thread()
+        thread:StoppableThread = current_thread()
         self.presenter = presenter
 
         self.images_ids_paths = {}
@@ -149,12 +151,12 @@ class Model:
         self.presenter.step_started(Steps.search_images)
 
         # Search for images in path (POSSIBLE UPGRADE give option to search in a group of folders)
-        print(f"Searching for images in {self.images_path} with file types ({self.selected_file_types})")
+        logging.info(f"Searching for images in {self.images_path} with file types ({self.selected_file_types})")
         images_names_paths = file_searcher.file_search(self.images_path, tuple(self.selected_file_types), self.check_subdirectories)
 
         # If no images were found, stop the execution
         if len(images_names_paths) == 0:
-            print(f"No images found in the specified path with file types ({self.selected_file_types})")
+            logging.info(f"No images found in the specified path with file types ({self.selected_file_types}), stopping execution")
             self.presenter.run_completed()
             return
 
@@ -162,7 +164,7 @@ class Model:
         for (index, (image_name, image_path)) in enumerate(images_names_paths.items()):
             self.images_ids_paths[index] = f"{image_path}\\{image_name}"
 
-        print("Walk completed")
+        logging.info(f"Found {len(self.images_ids_paths)} images")
 
         self.presenter.step_completed(Steps.search_images)
 
@@ -171,12 +173,12 @@ class Model:
 
         # POSSIBLE UPGRADE: Check if the features were calculated with the same parameters, if not, recalculate them 
         # (Currently it doesn't make sense because the user cannot change the parameters)
-        print(f"Selected feature extraction method: {self.selected_feature_extraction_method}")
-        print(f"File saved feature extraction method: {self.configFileManager.get_config_parameter('cache', 'method')}")
+        logging.info(f"Currently selected feature extraction method: {self.selected_feature_extraction_method}")
+        logging.info(f"File saved feature extraction method: {self.configFileManager.get_config_parameter('cache', 'method')}")
 
         feature_extraction_method_changed:bool = self.selected_feature_extraction_method != self.configFileManager.get_config_parameter('cache', 'method')
         if self.force_recalculate_features or feature_extraction_method_changed:
-            print("Forcing recalculation of features")
+            logging.info("Forcing recalculation of features")
             images_cached_features = {}       
         else:
             self.presenter.step_started(Steps.load_cached_features)
@@ -206,8 +208,8 @@ class Model:
 
         self.presenter.step_completed(Steps.load_images)
 
-        print(f"{len(images_pixel_data)} images loaded")
-        print(f"{len(images_cached_features)} images did not need to be loaded")
+        logging.info(f"{len(images_pixel_data)} images loaded")
+        logging.info(f"{len(images_cached_features)} images features loaded from cache")
 
         # Create SimilarityCalculator object
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.selected_feature_extraction_method)
@@ -241,7 +243,7 @@ class Model:
         # Save features to cache file
         # If the user has selected to save the calculated features, and there are images to save
         if self.save_calculated_features and len(images_pixel_data) > 0:
-            print("Saving calculated features to cache file")
+            logging.info("Saving calculated features to cache file")
             self.presenter.step_started(Steps.cache_features)
         
             self.cached_features_method = self.selected_feature_extraction_method

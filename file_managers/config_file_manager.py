@@ -1,4 +1,5 @@
 import configparser
+import logging
 from constants import *
 
 '''
@@ -30,7 +31,7 @@ class ConfigFileManager:
             self.config.write(configfile)
 
     def _create_config_file(self) -> None:
-        print("Creating config file...")
+        logging.info("Creating config file...")
         self.config[CONFIG_SECTION_PATHS] = {CONFIG_PARAMETER_IMAGES_PATH: CONFIG_DEFAULT_VALUE_IMAGES_PATH, 
                                              CONFIG_PARAMETER_CACHE_FILE_PATH: CONFIG_DEFAULT_VALUE_CACHE_FILE_PATH}
         

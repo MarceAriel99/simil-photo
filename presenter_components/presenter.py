@@ -6,12 +6,14 @@ from view_components.view import View
 from steps import Steps
 import timeit
 
+import logging
+
 '''
 This class is the presenter of the application, it is responsible for the communication between the model and the view.
 '''
 class Presenter:
     def __init__(self, model: Model, view: View) -> None:
-        print("Presenter created")
+        logging.debug("Presenter created")
         self.model = model
         self.view = view
         self.clusters = None
@@ -47,7 +49,7 @@ class Presenter:
         self.model.set_force_recalculate_features(self.view.get_force_recalculate_features_checkbox_state())
         
     def run(self) -> None:
-        print("Presenter running")
+        logging.debug("Presenter running")
         self.view.init_ui(self)
         self._update_view_with_saved_data()
         self.view.mainloop()
@@ -171,21 +173,25 @@ class Presenter:
     # This method is called by the View when the user clicks the "Delete" button
     def handle_delete_button_click(self, path: str) -> None:
         # Should be done by model? It's not the responsibility of the presenter to delete files
-        print("Deleting", path)
+        logging.info(f"Deleting image -> {path}")
         try:
             os.remove(path)
             self.clusters[self.current_cluster].remove(path) # Remove from current cluster so it doesn't get displayed again
         except Exception as e:
-            print(e)
+            logging.error(f"Error deleting image -> {path}, {e}")
 
     # This method is called by the View when the user clicks the "Open" button
     def handle_open_button_click(self, path: str) -> None:
         # Should be done by model?
-        print("Opening", path)
+        logging.info(f"Opening image -> {path}")
         try:
             os.startfile(path)
         except Exception as e:
-            print(e)
+            logging.error(f"Error opening image -> {path}, {e}")
 
     def get_feature_extraction_methods(self) -> list[str]:
         return self.model.get_all_feature_extraction_methods()
+    
+    def update_config_file_with_selected_parameters(self) -> None:
+        self._apply_config_to_model()
+        self.model.update_config_file()

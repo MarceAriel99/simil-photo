@@ -22,7 +22,7 @@ class ImageCard(ttk.Frame):
         self.grid = parent
         self._initialize(presenter)
         
-    def _initialize(self, presenter:Presenter) -> None:
+    def _initialize(self, presenter) -> None:
         
         # Title
         self.title_label = ttk.Label(self)

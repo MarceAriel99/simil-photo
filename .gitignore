@@ -8,3 +8,6 @@ config.ini
 # Result files of pyinstaller
 /build
 /dist
+
+# Logs
+run.log

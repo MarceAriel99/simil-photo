@@ -1,5 +1,6 @@
 import numpy as np
 import timeit
+import logging
 
 class ColorHistogramFeatureExtractor():
 
@@ -42,6 +43,6 @@ class ColorHistogramFeatureExtractor():
 
         # End the timer and print the elapsed time
         end = timeit.default_timer()
-        print(f"{int((end - start) * 10 ** 6)} us/step")
+        logging.debug(f"ColorHistogramFeatureExtractor took {int((end - start) * 10 ** 6)} us/step")
 
         return signature

@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import os
 import queue
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 
+import logging
 import json
 
 from view_components.stoppable_thread import StoppableThread
@@ -156,7 +159,7 @@ class ConfigPanel(ttk.Frame):
 
     def cancel_process(self) -> None:
         self.run_status_label['text'] = "Stopping..."
-        print("Stopping...")
+        logging.info("Stopping execution...")
         self.processing_thread.stop()
 
     def periodic_call(self) -> None:
@@ -236,7 +239,6 @@ class ConfigPanel(ttk.Frame):
         return self.file_types_variables
 
     def get_selected_feature_extraction_method(self) -> str:
-        print(self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection()))
         return self.feature_extraction_listbox.get(self.feature_extraction_listbox.curselection())
 
     def get_cache_features_checkbox_state(self) -> bool:
@@ -250,7 +252,7 @@ class ConfigPanel(ttk.Frame):
             with open(PATH_FEATURE_EXTRACTION_METHOD_DESCRIPTIONS_FILE, "r") as f:
                 self.feature_extraction_methods_descriptions = json.load(f)
         except Exception as e:
-            print(e)
+            logging.error("Error loading feature extraction methods descriptions: %s", e)
             self.feature_extraction_methods_descriptions = {}
             for method in CONFIG_DEFAULT_VALUE_SUPPORTED_FEATURE_EXTRACTION_METHODS.split(','):
                 self.feature_extraction_methods_descriptions[method] = "No description available for " + method

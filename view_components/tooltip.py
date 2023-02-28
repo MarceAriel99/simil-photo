@@ -20,8 +20,9 @@ class ToolTip(object):
         tw.wm_overrideredirect(1)
         tw.wm_geometry("+%d+%d" % (x, y))
         label = Label(tw, text=self.text, justify=LEFT,
-                      background="#ffffe0", relief=SOLID, borderwidth=1,
-                      font=("tahoma", "8", "normal"))
+                      background="#202020", relief=SOLID, borderwidth=1,
+                      font=("tahoma", "8", "normal"),
+                      foreground="white")
         label.pack(ipadx=1)
 
     def hidetip(self) -> None:

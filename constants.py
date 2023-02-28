@@ -32,3 +32,11 @@ CONFIG_DEFAULT_VALUE_MISC_CHECK_SUBDIRECTORIES = 'True'
 PATH_CONFIG_FILE = 'config.ini'
 PATH_DEFAULT_CACHE_FILE = 'cached_features.csv'
 PATH_FEATURE_EXTRACTION_METHOD_DESCRIPTIONS_FILE = 'feature_extraction_methods_descriptions.json'
+
+TOOLTIP_IMAGES_PATH = 'Path to the folder containing the images to be grouped'
+TOOLTIP_INCLUDE_SUBDIRECTORIES = 'Include subdirectories (subfolders) when searching for images'
+TOOLTIP_FILE_TYPES = 'File types to be included when searching for images'
+TOOLTIP_CACHE_FEATURES = 'Cache the calculated features to speed up the process the next time you group these images'
+TOOLTIP_FORCE_RECALCULATE_FEATURES = 'Force recalculate the features even if they are already cached'
+
+TOOLTIP_DELETE_WARNING_MESSAGE = 'WARNING: This will delete the file permanently!'

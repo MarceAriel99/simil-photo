@@ -11,7 +11,7 @@ from constants import *
 
 from view_components.custom_entry import CustomEntry
 
-#TODO: Include descriptions for configuration options (as tooltips)
+import view_components.tooltip as tooltip
 
 class ConfigPanel(ttk.Frame):
 
@@ -44,16 +44,19 @@ class ConfigPanel(ttk.Frame):
 
         self.file_search_title_label = ttk.Label(self.file_search_frame, text="File search", font=("Arial", 15, 'bold', 'underline'))
         self.path_label = ttk.Label(self.file_search_frame, text="Searching for images in path:")
+        tooltip.CreateToolTip(self.path_label, TOOLTIP_IMAGES_PATH)
         self.path_entry = CustomEntry(self.file_search_frame, width=50)
         self.path_entry.set_border_color("#303030")
         self.subdirectories_label = ttk.Label(self.file_search_frame, text="Include subdirectories")
+        tooltip.CreateToolTip(self.subdirectories_label, TOOLTIP_INCLUDE_SUBDIRECTORIES)
         self.subdirectories_var = tk.BooleanVar()
         self.subdirectories_checkbox = ttk.Checkbutton(self.file_search_frame, variable=self.subdirectories_var)
-        self.select_folder_button = ttk.Button(self.file_search_frame, text="Select folder", width=10)
+        self.select_folder_button = ttk.Button(self.file_search_frame, text="Select folder", width=12)
         self.select_folder_button.bind("<Button-1>", presenter.handle_select_folder_button_click)
 
         self.file_types_frame = ttk.Frame(self.file_search_frame,)
         self.file_types_label = ttk.Label(self.file_types_frame, text="File types:")
+        tooltip.CreateToolTip(self.file_types_label, TOOLTIP_FILE_TYPES)
         self.jpg_label = ttk.Label(self.file_types_frame, text="JPG")
         self.jpg_var = tk.BooleanVar()
         self.jpg_checkbox = ttk.Checkbutton(self.file_types_frame, variable=self.jpg_var)
@@ -101,10 +104,12 @@ class ConfigPanel(ttk.Frame):
         self.feature_cache_recalculate_frame = ttk.Frame(self.feature_extraction_frame)
 
         self.cache_features_label = ttk.Label(self.feature_cache_recalculate_frame, text="Cache image features")
+        tooltip.CreateToolTip(self.cache_features_label, TOOLTIP_CACHE_FEATURES)
         self.cache_features_var = tk.BooleanVar()
         self.cache_features_checkbox = ttk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.cache_features_var)
 
         self.force_recalculate_features_label = ttk.Label(self.feature_cache_recalculate_frame, text="Force recalculate features")
+        tooltip.CreateToolTip(self.force_recalculate_features_label, TOOLTIP_FORCE_RECALCULATE_FEATURES)
         self.force_recalculate_features_var = tk.BooleanVar()
         self.force_recalculate_features_checkbox = ttk.Checkbutton(self.feature_cache_recalculate_frame, variable=self.force_recalculate_features_var)
 

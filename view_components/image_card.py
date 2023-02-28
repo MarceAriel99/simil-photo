@@ -6,6 +6,8 @@ from PIL import ImageTk, Image, ImageOps
 from view_components.image_square_cropper import crop_square
 import view_components.tooltip as tooltip
 
+from constants import *
+
 class ImageCard(ttk.Frame):
 
     def __init__(self, parent, window, presenter, path, *args, **kwargs) -> None:
@@ -43,15 +45,21 @@ class ImageCard(ttk.Frame):
 
         # Directory
         self.directory_label = ttk.Label(self)
+        short_directory = self.path
 
         splitted_path = self.path.split("\\")
-        short_directory = splitted_path[0] + "\\" + splitted_path[1] + "\\..." + "\\" + splitted_path[-2]
+
+        # Shorten directory path if it's too long (Making this more generic is too complicated for the advantage it would bring)
+        if len(short_directory) > 22:
+            short_directory = splitted_path[0] + "\\" + splitted_path[1] + "\\..." + "\\" + splitted_path[-2]
+            tooltip.CreateToolTip(self.directory_label, self.path)
         if len(short_directory) > 22:
             short_directory = splitted_path[0] + "\\..." + "\\" + splitted_path[-2]
-            tooltip.CreateToolTip(self.directory_label, self.path)
-
+        if len(short_directory) > 22:
+            short_directory = splitted_path[0] + "\\..."
+        
         self.directory_label.config(text=f"Directory: {short_directory}")
-        self.directory_label.grid(row=2, column=0, columnspan=2, sticky=tk.W, padx=5)    
+        self.directory_label.grid(row=2, column=0, columnspan=2, sticky=tk.W, padx=5)
 
         # File size
         file_size_in_bytes = os.path.getsize(self.path)
@@ -74,7 +82,7 @@ class ImageCard(ttk.Frame):
         self.delete_button = ttk.Button(self, text="Delete file")
         self.delete_button.bind("<Button-1>", lambda event, path=self.path: self.handle_delete_button_click(path))
         self.delete_button.grid(row=5, column=0, sticky=tk.W, padx=5, pady=(2,8))
-        tooltip.CreateToolTip(self.delete_button, "WARNING: This will delete the file permanently!")
+        tooltip.CreateToolTip(self.delete_button, TOOLTIP_DELETE_WARNING_MESSAGE)
 
         # Open button
         self.open_button = ttk.Button(self, text="Open")

@@ -7,7 +7,6 @@ from view_components.top_bar import TopBar
 
 from ttkthemes import ThemedTk
 
-#TODO: Add a theme to the app
 class View(ThemedTk):
 
     # GUI SETUP

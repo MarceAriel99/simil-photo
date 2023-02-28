@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['main.py'],
+    ['main.pyw'],
     pathex=[],
     binaries=[],
     datas=[('E:\\Mis_Archivos\\Proyects\\Programs\\SimilPhoto\\Program\\venv\\lib\\site-packages\\tensorflow\\python\\_pywrap_tensorflow_internal.pyd', 'tensorflow\python')],
@@ -36,7 +36,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

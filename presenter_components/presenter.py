@@ -24,7 +24,7 @@ class Presenter:
         folder_path_entry = model_images_path if model_images_path else "No folder selected"
         self.view.update_path_entry(folder_path_entry)
         # POSSIBLE UPGRADE should access through a method to change the state of the checkbox
-        self.view.config_panel.subdirectories_checkbox.state(['selected']) if self.model.get_check_subdirectories() else self.view.config_panel.subdirectories_checkbox.state(['!selected'])
+        self.view.config_panel.subdirectories_var.set(True) if self.model.get_check_subdirectories() else self.view.config_panel.subdirectories_var.set(False)
 
         # Update file types checkboxes
         for file_type in self.model.get_all_file_types():
@@ -36,8 +36,8 @@ class Presenter:
         # Update feature extraction method selection
         feature_extraction_methods = self.model.get_all_feature_extraction_methods()
         self.view.config_panel.select_feature_extraction_method(feature_extraction_methods.index(self.model.get_feature_extraction_method()))
-        self.view.config_panel.cache_features_checkbox.state(['selected']) if self.model.get_save_calculated_features() else self.view.config_panel.cache_features_checkbox.state(['!selected'])
-        self.view.config_panel.force_recalculate_features_checkbox.state(['selected']) if self.model.get_force_recalculate_features() else self.view.config_panel.force_recalculate_features_checkbox.state(['!selected'])
+        self.view.config_panel.cache_features_var.set(True) if self.model.get_save_calculated_features() else self.view.config_panel.cache_features_var.set(False)
+        self.view.config_panel.force_recalculate_features_var.set(True) if self.model.get_force_recalculate_features() else self.view.config_panel.force_recalculate_features_var.set(False)
     
     # This method is called just before the model starts the process and it updates the model with the data from the view
     def _apply_config_to_model(self) -> None:

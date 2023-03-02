@@ -42,6 +42,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon='E:\\Mis_Archivos\\Proyects\\Programs\\SimilPhoto\\Program\\resources\\logo.ico',
 )
 coll = COLLECT(
     exe,

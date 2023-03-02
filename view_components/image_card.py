@@ -16,13 +16,13 @@ class ImageCard(ttk.Frame):
 
     def __init__(self, parent, window, presenter, path, *args, **kwargs) -> None:
         ttk.Frame.__init__(self, parent, *args, **kwargs)
-        self.presenter = presenter
+        self.presenter:Presenter = presenter
         self.window = window
         self.path = path
         self.grid = parent
-        self._initialize(presenter)
+        self._initialize()
         
-    def _initialize(self, presenter) -> None:
+    def _initialize(self) -> None:
         
         # Title
         self.title_label = ttk.Label(self)

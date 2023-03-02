@@ -3,10 +3,9 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import ttk
 
-from PIL import ImageTk, Image, ImageOps
+from PIL import ImageTk, Image
 
 from view_components.image_card import ImageCard
-from view_components.image_square_cropper import crop_square
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

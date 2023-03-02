@@ -3,9 +3,6 @@ import keras.utils as image
 
 import logging
 
-from keras.applications.vgg16 import VGG16
-from keras.applications.vgg16 import preprocess_input
-
 from sklearn.cluster import AffinityPropagation
 from sklearn.metrics.pairwise import cosine_similarity
 

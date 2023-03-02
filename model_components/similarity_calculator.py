@@ -1,6 +1,8 @@
 import numpy as np
 import keras.utils as image
 
+import logging
+
 from keras.applications.vgg16 import VGG16
 from keras.applications.vgg16 import preprocess_input
 
@@ -13,6 +15,8 @@ from feature_extractors.mobilenet_extractor import MobileNetFeatureExtractor
 
 from view_components.stoppable_thread import StoppableThread
 from steps import Steps
+
+import warnings
 
 '''
 This calculates the similarity between images using the extracted features and clusters them using affinity propagation
@@ -126,7 +130,16 @@ class SimilarityCalculator():
         if self.clustering_method != 'affinity_propagation':
             raise Exception(f"Clustering method '{self.clustering_method}' not implemented")
 
-        affprop = AffinityPropagation(affinity="precomputed", damping=0.5, max_iter=350 , preference= 0.5).fit(similarity_matrix)
+        warnings.filterwarnings("error")
+        try:
+            affprop = AffinityPropagation(affinity="precomputed", damping=0.5, max_iter=350 , preference= 0.5).fit(similarity_matrix)
+        except UserWarning as w:
+            logging.error(f"Error calculating clusters: {w}")
+            return []
+        except Exception as e:
+            logging.error(f"Error calculating clusters: {e}")
+            return []
+        warnings.filterwarnings("default")
 
         clusters = [[] for _ in range(max(affprop.labels_) + 1)]
 

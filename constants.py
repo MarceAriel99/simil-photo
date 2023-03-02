@@ -33,6 +33,8 @@ PATH_CONFIG_FILE = 'config.ini'
 PATH_DEFAULT_CACHE_FILE = 'cached_features.csv'
 PATH_TEMP_FILE = 'temp.csv'
 PATH_FEATURE_EXTRACTION_METHOD_DESCRIPTIONS_FILE = 'feature_extraction_methods_descriptions.json'
+PATH_LOGO_IMAGE = 'resources/logo.png'
+PATH_LOGO_GREYSCALE_IMAGE = 'resources/logo_greyscale.png'
 
 TOOLTIP_IMAGES_PATH = 'Path to the folder containing the images to be grouped'
 TOOLTIP_INCLUDE_SUBDIRECTORIES = 'Include subdirectories (subfolders) when searching for images'

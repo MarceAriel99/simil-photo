@@ -15,6 +15,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from presenter_components.presenter import Presenter
 
+from constants import PATH_LOGO_IMAGE
+
 class View(ThemedTk):
 
     # GUI SETUP
@@ -28,6 +30,7 @@ class View(ThemedTk):
         style.theme_use('black')
         self._configure_styles()
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.iconphoto(True, tk.PhotoImage(file=PATH_LOGO_IMAGE))
         logging.debug("View created")
         
     def _configure_styles(self) -> None:
@@ -103,12 +106,16 @@ class View(ThemedTk):
     # IMAGES GRID
 
     def load_and_display_images(self, images_paths:list[str]) -> None:
+        self.images_grid.remove_logo()
         self.empty_grid()
         for image_path in images_paths:
             self.images_grid.add_image(image_path)
 
     def empty_grid(self) -> None:
         self.images_grid.delete_all_images()
+
+    def add_logo(self) -> None:
+        self.images_grid.add_logo()
 
     # TOP BAR
 

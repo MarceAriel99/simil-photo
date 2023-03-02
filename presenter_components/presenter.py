@@ -85,6 +85,7 @@ class Presenter:
         # If there are no clusters, hide the group frame
         if len(self.clusters) == 0:
             self.view.change_group_frame_visibility(False)
+            self.view.add_logo()
             return
 
         # Show the group frame and load the first group

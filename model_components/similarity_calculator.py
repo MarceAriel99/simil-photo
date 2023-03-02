@@ -64,6 +64,10 @@ class SimilarityCalculator():
 
     def run_cluster_calculation(self) -> list[list[int]]: # Each list inside contains a group of id's of similar images ordered by similarity
 
+        # If similarity matrix is empty or has only one image, return an empty list
+        if self.similarity_matrix is None or self.similarity_matrix.shape[0] == 1:
+            return []
+
         # Calculate clusters
         self.image_clusters = self._calculate_clusters(self.similarity_matrix)
 

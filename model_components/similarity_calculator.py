@@ -112,7 +112,7 @@ class SimilarityCalculator():
 
         return images_features
 
-    def _calculate_similarity_matrix(self, images_features) -> np.ndarray:
+    def _calculate_similarity_matrix(self, images_features:dict[int,np.array]) -> np.ndarray:
 
         # The array has to be ordered by id, because the cluster uses the index of the array as the id of the image
         features_array = [[] for _ in range(len(images_features))]

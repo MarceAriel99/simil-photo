@@ -189,6 +189,8 @@ class Model:
         # images_pixel_data is a dict with {id: pixel_data} pairs (without cached features)
         self.presenter.step_started(Steps.load_images)
 
+        failed_to_load_images = []
+
         images_pixel_data = {}
         for (image_id, image_path) in self.images_ids_paths.items():
 
@@ -200,16 +202,29 @@ class Model:
             
             if image_id in images_cached_features:
                 continue
+            
+            try:
+                img = image.load_img(image_path, target_size=(224, 224))
+                img_data = image.img_to_array(img)
+                images_pixel_data[image_id] = img_data
+            except Exception as e:
+                # Add image to the list of images that couldn't be loaded
+                failed_to_load_images.append(image_id)
+                logging.error(f"Error loading image {image_path}: {e}")
 
-            img = image.load_img(image_path, target_size=(224, 224))
-            img_data = image.img_to_array(img)
-            images_pixel_data[image_id] = img_data
             self.step_progress(Steps.load_images, len(images_pixel_data), len(self.images_ids_paths))
+
+        for failed_image in failed_to_load_images:
+            del self.images_ids_paths[failed_image]
 
         self.presenter.step_completed(Steps.load_images)
 
         logging.info(f"{len(images_pixel_data)} images loaded")
         logging.info(f"{len(images_cached_features)} images features loaded from cache")
+
+        # Rewrite images_pixel_data and images_ids_paths to include only the images that were loaded and not leave any empty spaces in the keys
+        images_pixel_data = {index: images_pixel_data[key] for (index, key) in enumerate(images_pixel_data)}
+        self.images_ids_paths = {index: self.images_ids_paths[key] for (index, key) in enumerate(self.images_ids_paths)}
 
         # Create SimilarityCalculator object
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.selected_feature_extraction_method)

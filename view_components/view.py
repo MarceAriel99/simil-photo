@@ -24,7 +24,7 @@ class View(ThemedTk):
     def __init__(self) -> None:
         super().__init__()
         self.title('SimilPhoto')
-        self.minsize(width=800, height=730)
+        self.minsize(width=800, height=665)
         self.geometry('1630x750')
         style = ttk.Style()
         style.theme_use('black')

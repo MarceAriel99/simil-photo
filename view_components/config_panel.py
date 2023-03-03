@@ -37,10 +37,10 @@ class ConfigPanel(ttk.Frame):
         self.config_title_label.grid(row=0, column=0, sticky="nw", pady=(0, 10))
         self.file_search_frame = ttk.Frame(self)
         self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=10)
-        ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=30)
+        ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=10)
         self.feature_extraction_frame = ttk.Frame(self)
         self.feature_extraction_frame.grid(row=3, column=0, sticky="nsew", pady=10)
-        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=30)
+        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=10)
         self.run_frame = ttk.Frame(self)
         self.run_frame.grid(row=5, column=0, sticky="nsew", pady=10)
 
@@ -139,7 +139,7 @@ class ConfigPanel(ttk.Frame):
     def _create_run_submenu(self, presenter:Presenter) -> None:
         
         self.run_status_label = ttk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
-        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,10), columnspan=3)
+        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,5), columnspan=3)
 
         self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1, )
         self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(10,5))

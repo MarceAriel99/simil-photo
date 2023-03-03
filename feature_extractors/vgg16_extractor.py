@@ -4,6 +4,8 @@ from keras.applications.vgg16 import VGG16, preprocess_input
 from keras.layers import Flatten, Dense
 from keras.models import Model
 
+import logging
+
 class VGG16FeatureExtractor():
 
     def __init__(self, parameters:dict[str,any]={}) -> None:
@@ -35,6 +37,10 @@ class VGG16FeatureExtractor():
         
         img_data = np.expand_dims(img, axis=0)
         img_data = preprocess_input(img_data)
-        features = self.model.predict(img_data)
+        try:
+            features = self.model.predict(img_data, verbose=0)
+        except Exception as e:
+            logging.error(f"Error while extracting features {e}")
+            raise e
 
         return features[0]

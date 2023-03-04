@@ -83,5 +83,5 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 - Give the option to select and delete groups of images instead of doing it individually
 
 ## Disclaimer
-I advise you to be careful when using the program. After all, it has the power to delete files from your PC that may not be recoverable.\
+I advise you to be careful when using the program. After all, it can delete files from your PC that may not be recoverable.\
 You should always have backups of your photos.

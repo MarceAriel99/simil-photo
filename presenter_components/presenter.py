@@ -55,7 +55,7 @@ class Presenter:
         self.view.mainloop()
 
     # This method is called by the Model when it finishes the process, it updates the view with the results
-    def run_completed(self, stopped:bool=False) -> None:
+    def run_completed(self, stopped:bool=False, ignored_images_count:int=0) -> None:
         self.current_cluster = 0
         self.clusters = self.model.get_clusters_paths()
         self.view.update_status_label(f"{len(self.clusters)} Groups found!")
@@ -72,6 +72,9 @@ class Presenter:
             time_label = f"Process completed in {int(total_time)} second" + ("s" if int(total_time) > 1 else "")
         else:
             time_label = f"Process completed in {int(total_time // 60)} minute" + ("s" if int(total_time // 60) > 1 else "") + f" and {int(total_time % 60)} second" + ("s" if int(total_time % 60) > 1 else "")
+
+        if ignored_images_count > 0:
+            time_label += f" ({ignored_images_count} image" + ("s" if ignored_images_count > 1 else "") + " ignored)"
 
         # If the process was stopped, the label doesn't show the time it took to complete the process
         if stopped:
@@ -99,7 +102,7 @@ class Presenter:
 
         if step == Steps.search_images:
             self.add_message_to_queue(("STARTED_STEP", step))
-        elif step == Steps.delete_corrupted_images:
+        elif step == Steps.verify_images:
             self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.load_cached_features:
             self.add_message_to_queue(("STARTED_STEP", step))
@@ -117,7 +120,7 @@ class Presenter:
         
         if step == Steps.search_images:
             self.add_message_to_queue(("COMPLETED_STEP", 5))
-        elif step == Steps.delete_corrupted_images:
+        elif step == Steps.verify_images:
             self.add_message_to_queue(("COMPLETED_STEP", 10))
         elif step == Steps.load_cached_features:
             self.add_message_to_queue(("COMPLETED_STEP", 20))
@@ -130,8 +133,8 @@ class Presenter:
         elif step == Steps.cache_features:
             self.add_message_to_queue(("COMPLETED_STEP", 95))
 
-    def step_progress(self, features_extracted: int, total_features: int, step) -> None:
-        self.add_message_to_queue(("STEP_PROGRESS", f"{step} ({features_extracted} / {total_features})"))
+    def step_progress(self, current_substep: int, total_substeps: int, step) -> None:
+        self.add_message_to_queue(("STEP_PROGRESS", f"{step} ({current_substep} / {total_substeps})"))
 
     # Changes the group that is being displayed to the next one
     def handle_next_group_button_click(self, event=None) -> None:

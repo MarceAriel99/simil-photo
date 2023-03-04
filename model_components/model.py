@@ -11,6 +11,7 @@ from model_components.similarity_calculator import SimilarityCalculator
 
 import numpy as np
 import keras.utils as image
+from PIL import Image
 
 from view_components.stoppable_thread import StoppableThread, current_thread
 
@@ -159,15 +160,18 @@ class Model:
             logging.info(f"No images found in the specified path with file types ({self.selected_file_types}), stopping execution")
             self.presenter.run_completed()
             return
+        
+        self.presenter.step_completed(Steps.search_images)
 
         logging.info(f"Found {len(self.images_ids_paths)} images")
 
         # Ignore images that cannot be opened from images_ids_paths
-        self.presenter.step_started(Steps.delete_corrupted_images)
-        self.images_ids_paths = self._delete_corrupted_images(self.images_ids_paths)
-
-        self.presenter.step_completed(Steps.search_images)
-
+        self.presenter.step_started(Steps.verify_images)
+        ignored_images_count = len(self.images_ids_paths)
+        self.images_ids_paths = self._delete_unverified_images(self.images_ids_paths, thread)
+        ignored_images_count -= len(self.images_ids_paths)
+        self.presenter.step_completed(Steps.verify_images)
+        
         # Load cached features
         # images_cached_features is a dict with {id: features} pairs
 
@@ -259,7 +263,7 @@ class Model:
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
 
         # Call presenter to show results
-        self.presenter.run_completed()
+        self.presenter.run_completed(False, ignored_images_count)
     
     # Return a list of clusters, each cluster is a list of image paths
     def get_clusters_paths(self) -> list[list[str]]:
@@ -274,17 +278,28 @@ class Model:
 
         return result
     
-    def step_progress(self, current_step:Steps, features_extracted:int, total_features:int) -> None:
-        self.presenter.step_progress(features_extracted, total_features, current_step)
+    def step_progress(self, current_step:Steps, current_substep:int, total_substeps:int) -> None:
+        self.presenter.step_progress(current_substep, total_substeps, current_step)
 
-    def _delete_corrupted_images(self, images_paths:dict[int,str]) -> dict[int,str]:
+    def _delete_unverified_images(self, images_paths:dict[int,str], thread:StoppableThread) -> dict[int,str]:
         images_paths_copy = images_paths.copy()
         for (image_id, image_path) in images_paths.items():
+
+            # Check if thread was stopped while loading images
+            if thread.stopped():
+                if not thread.close_window:
+                    self.presenter.run_completed(True)
+                return
+            
             try:
-                img = image.load_img(image_path, target_size=(20, 20))
+                # Check if image can be loaded
+                im = Image.open(image_path)
+                im.verify()
             except Exception as e:
                 logging.error(f"Error loading image {image_path}: {e}")
                 del images_paths_copy[image_id]
+
+            self.step_progress(Steps.verify_images, image_id, len(images_paths))
 
         # Make ids consecutive
         images_paths_copy = {index: image_path for (index, image_path) in enumerate(images_paths_copy.values())}

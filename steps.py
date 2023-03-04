@@ -2,7 +2,7 @@ from enum import Enum
 
 class Steps(str, Enum):
     search_images = "Searching images..."
-    delete_corrupted_images = "Deleting corrupted images..."
+    verify_images = "Verifying images..."
     load_cached_features = "Loading cached features..."
     load_images = "Loading images..."
     calculate_features = "Calculating features..."

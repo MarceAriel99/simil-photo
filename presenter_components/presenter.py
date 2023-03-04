@@ -99,6 +99,8 @@ class Presenter:
 
         if step == Steps.search_images:
             self.add_message_to_queue(("STARTED_STEP", step))
+        elif step == Steps.delete_corrupted_images:
+            self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.load_cached_features:
             self.add_message_to_queue(("STARTED_STEP", step))
         elif step == Steps.load_images:
@@ -115,6 +117,8 @@ class Presenter:
         
         if step == Steps.search_images:
             self.add_message_to_queue(("COMPLETED_STEP", 5))
+        elif step == Steps.delete_corrupted_images:
+            self.add_message_to_queue(("COMPLETED_STEP", 10))
         elif step == Steps.load_cached_features:
             self.add_message_to_queue(("COMPLETED_STEP", 20))
         elif step == Steps.load_images:

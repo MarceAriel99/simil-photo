@@ -152,19 +152,22 @@ class Model:
 
         # Search for images in path (POSSIBLE UPGRADE give option to search in a group of folders)
         logging.info(f"Searching for images in {self.images_path} with file types ({self.selected_file_types})")
-        images_names_paths = file_searcher.file_search(self.images_path, tuple(self.selected_file_types), self.check_subdirectories)
+        self.images_ids_paths = file_searcher.file_search(self.images_path, tuple(self.selected_file_types), self.check_subdirectories)
 
         # If no images were found, stop the execution
-        if len(images_names_paths) == 0:
+        if len(self.images_ids_paths) == 0:
             logging.info(f"No images found in the specified path with file types ({self.selected_file_types}), stopping execution")
             self.presenter.run_completed()
             return
 
-        # Create dictionary with {id: path} pairs
-        for (index, (image_name, image_path)) in enumerate(images_names_paths.items()):
-            self.images_ids_paths[index] = f"{image_path}\\{image_name}"
-
         logging.info(f"Found {len(self.images_ids_paths)} images")
+
+        # Ignore images that cannot be opened from images_ids_paths
+        self.presenter.step_started(Steps.delete_corrupted_images)
+        self.images_ids_paths = self._delete_corrupted_images(self.images_ids_paths)
+
+        for (id, image_path) in self.images_ids_paths.items():
+            print(f"images_ids_paths -> {id}: {image_path}")
 
         self.presenter.step_completed(Steps.search_images)
 
@@ -189,8 +192,6 @@ class Model:
         # images_pixel_data is a dict with {id: pixel_data} pairs (without cached features)
         self.presenter.step_started(Steps.load_images)
 
-        failed_to_load_images = []
-
         images_pixel_data = {}
         for (image_id, image_path) in self.images_ids_paths.items():
 
@@ -203,28 +204,19 @@ class Model:
             if image_id in images_cached_features:
                 continue
             
-            try:
-                img = image.load_img(image_path, target_size=(224, 224))
-                img_data = image.img_to_array(img)
-                images_pixel_data[image_id] = img_data
-            except Exception as e:
-                # Add image to the list of images that couldn't be loaded
-                failed_to_load_images.append(image_id)
-                logging.error(f"Error loading image {image_path}: {e}")
+            img = image.load_img(image_path, target_size=(224, 224))
+            img_data = image.img_to_array(img)
+            images_pixel_data[image_id] = img_data
 
             self.step_progress(Steps.load_images, len(images_pixel_data), len(self.images_ids_paths))
-
-        for failed_image in failed_to_load_images:
-            del self.images_ids_paths[failed_image]
 
         self.presenter.step_completed(Steps.load_images)
 
         logging.info(f"{len(images_pixel_data)} images loaded")
         logging.info(f"{len(images_cached_features)} images features loaded from cache")
 
-        # Rewrite images_pixel_data and images_ids_paths to include only the images that were loaded and not leave any empty spaces in the keys
-        images_pixel_data = {index: images_pixel_data[key] for (index, key) in enumerate(images_pixel_data)}
-        self.images_ids_paths = {index: self.images_ids_paths[key] for (index, key) in enumerate(self.images_ids_paths)}
+        for id in images_cached_features.keys():
+            print(f"images_cached_features -> {id}: {self.images_ids_paths[id]}")
 
         # Create SimilarityCalculator object
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.selected_feature_extraction_method)
@@ -265,6 +257,7 @@ class Model:
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features
+                print(f"Saving features for image {image_id} of path {self.images_ids_paths.get(image_id)}")
             
             cached_features_file_manager.save_cached_features(images_paths_features, self.cache_file_path, feature_extraction_method_changed)
             self.presenter.step_completed(Steps.cache_features)
@@ -290,3 +283,17 @@ class Model:
     
     def step_progress(self, current_step:Steps, features_extracted:int, total_features:int) -> None:
         self.presenter.step_progress(features_extracted, total_features, current_step)
+
+    def _delete_corrupted_images(self, images_paths:dict[int,str]) -> dict[int,str]:
+        images_paths_copy = images_paths.copy()
+        for (image_id, image_path) in images_paths.items():
+            try:
+                img = image.load_img(image_path, target_size=(20, 20))
+            except Exception as e:
+                logging.error(f"Error loading image {image_path}: {e}")
+                del images_paths_copy[image_id]
+
+        # Make ids consecutive
+        images_paths_copy = {index: image_path for (index, image_path) in enumerate(images_paths_copy.values())}
+
+        return images_paths_copy

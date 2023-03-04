@@ -29,6 +29,9 @@ def load_cached_features(images_ids_paths:dict[int, str], file_path:str) -> dict
     except Exception as e:
         logging.error(e)
 
+    # Rewrite cached_features to include only the images that were loaded and not leave any empty spaces in the keys
+    cached_features = {index: cached_features[key] for index, key in enumerate(cached_features.keys())}
+
     return cached_features
 
 '''

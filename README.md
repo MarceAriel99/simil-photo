@@ -1,6 +1,6 @@
 <h1 align="center" style="color:black"> Simil Photo <img src="/resources/graphics/logo.png" width="80" align="center"/>  </h1> 
 
-I developed this project because I needed a way to easily detect and erase similar images or duplicates I have in my PC.\
+I developed this project because I needed a way to easily detect and erase similar or duplicate images in my PC.\
 This is a pure Python 🐍 application and it's ready to run on Windows without any additional software (It doesn't even need Python).
 
 ### Languages and tools
@@ -11,33 +11,35 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 ## Showcase
 
 **These are the images that I'll be using**\
+<img src="https://user-images.githubusercontent.com/60658991/222874785-cc8fc6f6-a0e0-4a80-a6d4-ce22de80eb3f.png" width="400" align="center"/>
 </br>
-<img src="https://user-images.githubusercontent.com/60658991/222874785-cc8fc6f6-a0e0-4a80-a6d4-ce22de80eb3f.png" width="500" align="center"/>
-
+</br>
 **I initialize the program and select the corresponding folder**\
+<img src="https://user-images.githubusercontent.com/60658991/222874879-b8276638-36a9-485a-a59e-e85f21edd21e.png" width="400" align="center"/>
 </br>
-<img src="https://user-images.githubusercontent.com/60658991/222874879-b8276638-36a9-485a-a59e-e85f21edd21e.png" width="500" align="center"/>
-
+</br>
 **Using VGG16, the program has separated these images in 5 groups as expected**\
+<img src="https://user-images.githubusercontent.com/60658991/222874953-4c93ff46-9a71-4cfb-870a-472c1f8725bc.png" width="400" align="center"/>
+<img src="https://user-images.githubusercontent.com/60658991/222874977-8d39f771-4db7-49c1-9432-fe765b5a6fe4.png" width="400" align="center"/>
+<img src="https://user-images.githubusercontent.com/60658991/222874982-611bf538-a40b-458e-9ce9-371ea06709d7.png" width="400" align="center"/>
+<img src="https://user-images.githubusercontent.com/60658991/222874987-9fe24516-b9da-4ca9-a3ed-c23dcdc10999.png" width="400" align="center"/>
+<img src="https://user-images.githubusercontent.com/60658991/222874992-58fc446d-640a-48fa-9156-af31e131d6d3.png" width="400" align="center"/>
 </br>
-<img src="https://user-images.githubusercontent.com/60658991/222874953-4c93ff46-9a71-4cfb-870a-472c1f8725bc.png" width="500" align="center"/>
-<img src="https://user-images.githubusercontent.com/60658991/222874977-8d39f771-4db7-49c1-9432-fe765b5a6fe4.png" width="500" align="center"/>
-<img src="https://user-images.githubusercontent.com/60658991/222874982-611bf538-a40b-458e-9ce9-371ea06709d7.png" width="500" align="center"/>
-<img src="https://user-images.githubusercontent.com/60658991/222874987-9fe24516-b9da-4ca9-a3ed-c23dcdc10999.png" width="500" align="center"/>
-<img src="https://user-images.githubusercontent.com/60658991/222874992-58fc446d-640a-48fa-9156-af31e131d6d3.png" width="500" align="center"/>
+</br>
+**Now I can navigate the groups, inspect the images and detele them individually**
 
 ## What I've learned
-- Implemented MVP (Model View Presenter) pattern
-- How to use keras pre-trained models to extract features from images
-...
+- MVP (Model View Presenter) pattern
+- Using keras pre-trained models to extract features from images
+- Load, resize and use images in Python with the PILLOW library
+- Build a UI with Tkinter and style it using Ttk and Ttkthemes
 
 ### Some insight into development
-- First approach (LSH)
-- Keras pre-trained models
-- Color histogram model
-- Tkinter
-- Threads
-...
+- For my first approach to this problem I tried to use LSH (Locality-sensitive hashing) to generate the buckets or groups of images. But figuring out how many buckets or clusters were needed was not possible. That's when I realized that it would be better to just try to cluster the images with a clustering alorithm that didn't need a number of clusters as an input. (In this case I used Affinity Propagation)
+- When it was time to extract the features from the images I created a "Color histogram" model. This method was very slow as it iterated every pixel of the image. I didn't know exactly how to optimize it using numpy but I was sure it was possible. I ended up optimizing it with the help of AI.
+- I was not completely happy with having only one method of extracting features, so I also investigated how to use Keras pre-trained models to have other options. I ended up using VGG16 and MobilenetV2 to give the user the option to choose between speed and precision.
+- I investigated how to make a UI for my program and ended up using Tkinter, as the UI I needed was very simple, and other options like PyQT had a lot more unnecesary complexity for this particular case.
+- The program has to do some intensive work when extracting features and clustering the images, so the UI was freezing for seconds or even minutes. I ended up using a thread for the heavy calculations to free the UI main thread. I also implemented a queue to send messages from the worker thread to the UI thread to give the user visual updates on how the process is going.
 
 ## How to use it
 1) Unzip the files to a folder
@@ -76,6 +78,9 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 ## Upgrade ideas
 - Show all error messages to the user in a popup so they can know when something goes wrong (And what went wrong)
 - Make the tkinter implementation more scalable to other screen resolutions (It is currently optimized for 1920x1080)
+- Have the possibility of changing the parameters of the Feature Extracting methods
+- Give the option to search in a group of folders
+- Give the option to select and delete groups of images instead of doing it individually
 
 ## Disclaimer
 I advise you to be careful when using the program. After all, it has the power to delete files from your PC which may not be recoverable.\

@@ -166,9 +166,6 @@ class Model:
         self.presenter.step_started(Steps.delete_corrupted_images)
         self.images_ids_paths = self._delete_corrupted_images(self.images_ids_paths)
 
-        for (id, image_path) in self.images_ids_paths.items():
-            print(f"images_ids_paths -> {id}: {image_path}")
-
         self.presenter.step_completed(Steps.search_images)
 
         # Load cached features
@@ -215,9 +212,6 @@ class Model:
         logging.info(f"{len(images_pixel_data)} images loaded")
         logging.info(f"{len(images_cached_features)} images features loaded from cache")
 
-        for id in images_cached_features.keys():
-            print(f"images_cached_features -> {id}: {self.images_ids_paths[id]}")
-
         # Create SimilarityCalculator object
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.selected_feature_extraction_method)
         # Set feature extraction parameters
@@ -257,7 +251,6 @@ class Model:
             images_paths_features:dict[str,np.array] = {}
             for (image_id, image_features) in similarity_calculator.get_normalized_features().items():
                 images_paths_features[self.images_ids_paths.get(image_id)] = image_features
-                print(f"Saving features for image {image_id} of path {self.images_ids_paths.get(image_id)}")
             
             cached_features_file_manager.save_cached_features(images_paths_features, self.cache_file_path, feature_extraction_method_changed)
             self.presenter.step_completed(Steps.cache_features)

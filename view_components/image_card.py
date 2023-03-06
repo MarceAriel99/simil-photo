@@ -14,10 +14,11 @@ if TYPE_CHECKING:
 
 class ImageCard(ttk.Frame):
 
-    def __init__(self, parent, window, presenter, path, *args, **kwargs) -> None:
+    def __init__(self, parent:tk.Text, window, presenter, path, *args, **kwargs) -> None:
         ttk.Frame.__init__(self, parent, *args, **kwargs)
-        self.presenter:Presenter = presenter
+        self.parent = parent
         self.window = window
+        self.presenter:Presenter = presenter
         self.path = path
         self.grid = parent
         self._initialize()
@@ -92,8 +93,14 @@ class ImageCard(ttk.Frame):
         self.open_button = ttk.Button(self, text="Open")
         self.open_button.bind("<Button-1>", lambda event, path=self.path: self.presenter.handle_open_button_click(path))
         self.open_button.grid(row=5, column=1, sticky=tk.E, padx=(0,5), pady=(2,8))
+
+        # Bind mousewheel to scroll
+        self.bind_all("<MouseWheel>", self._on_mousewheel)   
     
     def handle_delete_button_click(self, path:str) -> None:
         if tk.messagebox.askokcancel("Delete file", "Are you sure you want to delete this file?"):
             self.presenter.handle_delete_button_click(path)
             self.destroy()
+
+    def _on_mousewheel(self, event):
+        self.parent.yview_scroll(int(-1*(event.delta/120)), "units")

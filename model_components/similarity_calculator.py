@@ -50,10 +50,10 @@ class SimilarityCalculator():
     def get_normalized_features(self) -> dict[int, np.ndarray]:
         return self.image_features
 
-    def run_feature_calculation(self, thread:StoppableThread, progress_callback) -> None:
+    def run_feature_calculation(self, thread:StoppableThread, progress_callback, memory_usage_callback) -> None:
                 
         # Extract features
-        extracted_features = self._extract_features(self.images_pixel_data, thread, progress_callback)
+        extracted_features = self._extract_features(self.images_pixel_data, thread, progress_callback, memory_usage_callback)
 
         # Normalize features
         self.image_features.update(self._normalize_features(extracted_features))
@@ -77,7 +77,7 @@ class SimilarityCalculator():
 
         return self.image_clusters
     
-    def _extract_features(self, images_pixel_data: dict[int, np.array], thread:StoppableThread, progress_callback) -> dict[int, np.ndarray]:
+    def _extract_features(self, images_pixel_data: dict[int, np.array], thread:StoppableThread, progress_callback, memory_usage_callback) -> dict[int, np.ndarray]:
 
         if not images_pixel_data: return {} # If there are no images to extract features from, return an empty dictionary
             
@@ -96,6 +96,10 @@ class SimilarityCalculator():
             
             # If the thread is stopped, stop the feature extraction and return an empty dictionary
             if thread.stopped():
+                return {}
+            
+            #Check memory usage
+            if memory_usage_callback(thread):
                 return {}
 
             images_features[image_id] = feature_extractor.extract_features(img)

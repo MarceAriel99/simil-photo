@@ -15,7 +15,7 @@ class ConfigFileManager:
         try:
             open(PATH_CONFIG_FILE, 'r')
         except FileNotFoundError:
-            self._create_config_file()
+            self.create_config_file()
 
         self.config.read(PATH_CONFIG_FILE)
 
@@ -30,7 +30,7 @@ class ConfigFileManager:
         with open(PATH_CONFIG_FILE, 'w') as configfile:
             self.config.write(configfile)
 
-    def _create_config_file(self) -> None:
+    def create_config_file(self) -> None:
         logging.info("Creating config file...")
         self.config[CONFIG_SECTION_PATHS] = {CONFIG_PARAMETER_IMAGES_PATH: CONFIG_DEFAULT_VALUE_IMAGES_PATH, 
                                              CONFIG_PARAMETER_CACHE_FILE_PATH: CONFIG_DEFAULT_VALUE_CACHE_FILE_PATH}
@@ -48,7 +48,8 @@ class ConfigFileManager:
                                             CONFIG_PARAMETER_CACHE_SAVE_CALCULATED_FEATURES: CONFIG_DEFAULT_VALUE_CACHE_SAVE_CALCULATED_FEATURES,
                                             CONFIG_PARAMETER_CACHE_FEATURE_EXTRACTION_METHOD: CONFIG_DEFAULT_VALUE_CACHE_FEATURE_EXTRACTION_METHOD}
         
-        self.config[CONFIG_SECTION_MISC] = {CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES: CONFIG_DEFAULT_VALUE_MISC_CHECK_SUBDIRECTORIES}
+        self.config[CONFIG_SECTION_MISC] = {CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES: CONFIG_DEFAULT_VALUE_MISC_CHECK_SUBDIRECTORIES,
+                                            CONFIG_PARAMETER_MISC_MEMORY_USAGE_LIMIT: CONFIG_DEFAULT_VALUE_MISC_MEMORY_USAGE_LIMIT}
 
         with open(PATH_CONFIG_FILE, 'w') as configfile:
             self.config.write(configfile)

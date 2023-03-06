@@ -18,6 +18,8 @@ from view_components.stoppable_thread import StoppableThread, current_thread
 from steps import Steps
 from constants import *
 
+import psutil
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from presenter_components.presenter import Presenter
@@ -40,9 +42,17 @@ class Model:
 
         self.force_recalculate_features:bool = CONFIG_DEFAULT_VALUE_CACHE_FORCE_RECALCULATE_FEATURES
         self.save_calculated_features:bool = CONFIG_DEFAULT_VALUE_CACHE_SAVE_CALCULATED_FEATURES
+        
+        self.memory_usage_limit:int = int(CONFIG_DEFAULT_VALUE_MISC_MEMORY_USAGE_LIMIT)
 
         self.configFileManager = ConfigFileManager()
-        self._read_config_file()
+        try:
+            self._read_config_file()
+        except Exception as e:
+            logging.error('Error reading config file: ' + str(e))
+            logging.info('Creating new config file')
+            self.configFileManager.create_config_file()
+            
         logging.debug('Model initialized')
 
     # Read the config file and update the parameters
@@ -65,7 +75,8 @@ class Model:
         self.save_calculated_features = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_SAVE_CALCULATED_FEATURES) == 'True' else False
         self.cached_features_method = self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_FEATURE_EXTRACTION_METHOD)
 
-        self.check_subdirectories = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_MISC, CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES) == 'True' else False     
+        self.check_subdirectories = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_MISC, CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES) == 'True' else False
+        self.memory_usage_limit = int(self.configFileManager.get_config_parameter(CONFIG_SECTION_MISC, CONFIG_PARAMETER_MISC_MEMORY_USAGE_LIMIT))
 
     # Update the config file with the current parameters
     def update_config_file(self) -> None:
@@ -85,6 +96,7 @@ class Model:
         CONFIG_PARAMETER_CACHE_FEATURE_EXTRACTION_METHOD: self.cached_features_method }
 
         config_parameters[CONFIG_SECTION_MISC] = {CONFIG_PARAMETER_MISC_CHECK_SUBDIRECTORIES: str(self.check_subdirectories)}
+        config_parameters[CONFIG_SECTION_MISC] = {CONFIG_PARAMETER_MISC_MEMORY_USAGE_LIMIT: str(self.memory_usage_limit)}
 
         self.configFileManager.set_config_parameters(config_parameters)
 
@@ -202,6 +214,10 @@ class Model:
                     self.presenter.run_completed(True)
                 return
             
+            # Check memory usage
+            if self.memory_usage_over_limit(thread):
+                return
+
             if image_id in images_cached_features:
                 continue
             
@@ -224,7 +240,7 @@ class Model:
         # Run similarity calculator
         self.presenter.step_started(Steps.calculate_features)
 
-        similarity_calculator.run_feature_calculation(thread, self.step_progress)
+        similarity_calculator.run_feature_calculation(thread, self.step_progress, self.memory_usage_over_limit)
 
         # Check if thread was stopped while calculating features
         if thread.stopped():
@@ -262,8 +278,13 @@ class Model:
         # Filter clusters with only one image
         self.images_clusters = list(filter(lambda cluster: len(cluster) > 1, self.images_clusters))
 
+        # Create ignored images message
+        ignored_images_message = ""
+        if ignored_images_count > 0:
+            ignored_images_message = f"{ignored_images_count} image" + ("s" if ignored_images_count > 1 else "") + " ignored"
+
         # Call presenter to show results
-        self.presenter.run_completed(False, ignored_images_count)
+        self.presenter.run_completed(False, ignored_images_message)
     
     # Return a list of clusters, each cluster is a list of image paths
     def get_clusters_paths(self) -> list[list[str]]:
@@ -305,3 +326,12 @@ class Model:
         images_paths_copy = {index: image_path for (index, image_path) in enumerate(images_paths_copy.values())}
 
         return images_paths_copy
+    
+    def memory_usage_over_limit(self, thread:StoppableThread) -> bool:
+        memory_usage = psutil.virtual_memory().percent
+        if memory_usage > self.memory_usage_limit:
+            logging.error(f"Memory usage is {memory_usage}%, stopping execution")
+            if not thread.close_window:
+                self.presenter.run_completed(True, "Memory usage is too high")
+            return True
+        return False 

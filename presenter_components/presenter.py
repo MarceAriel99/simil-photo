@@ -55,7 +55,7 @@ class Presenter:
         self.view.mainloop()
 
     # This method is called by the Model when it finishes the process, it updates the view with the results
-    def run_completed(self, stopped:bool=False, ignored_images_count:int=0) -> None:
+    def run_completed(self, stopped:bool=False, message:str="") -> None:
         self.current_cluster = 0
         self.clusters = self.model.get_clusters_paths()
         self.view.update_status_label(f"{len(self.clusters)} Groups found!")
@@ -73,14 +73,13 @@ class Presenter:
         else:
             time_label = f"Process completed in {int(total_time // 60)} minute" + ("s" if int(total_time // 60) > 1 else "") + f" and {int(total_time % 60)} second" + ("s" if int(total_time % 60) > 1 else "")
 
-        if ignored_images_count > 0:
-            time_label += f" ({ignored_images_count} image" + ("s" if ignored_images_count > 1 else "") + " ignored)"
+        message = f" {message}" if message else ""
 
         # If the process was stopped, the label doesn't show the time it took to complete the process
         if stopped:
-            self.add_message_to_queue(("STARTED_STEP", "Process stopped!"))
+            self.add_message_to_queue(("STARTED_STEP", "Process stopped!" + message))
         else:
-            self.add_message_to_queue(("STARTED_STEP", time_label))
+            self.add_message_to_queue(("STARTED_STEP", time_label + message))
 
         # Finish the progress bar
         self.add_message_to_queue(("COMPLETED_STEP", 100))

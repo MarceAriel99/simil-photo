@@ -73,7 +73,7 @@ class Presenter:
         else:
             time_label = f"Process completed in {int(total_time // 60)} minute" + ("s" if int(total_time // 60) > 1 else "") + f" and {int(total_time % 60)} second" + ("s" if int(total_time % 60) > 1 else "")
 
-        message = f" {message}" if message else ""
+        message = f" ({message})" if message else ""
 
         # If the process was stopped, the label doesn't show the time it took to complete the process
         if stopped:

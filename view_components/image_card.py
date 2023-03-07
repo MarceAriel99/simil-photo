@@ -39,6 +39,7 @@ class ImageCard(ttk.Frame):
 
         # Image
         img = Image.open(self.path)
+        img.draft('RGB',(180,180))
         img = ImageOps.exif_transpose(img)
         origial_size = img.size
         img = crop_square(img)

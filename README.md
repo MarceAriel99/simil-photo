@@ -35,7 +35,7 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 - Build a UI with Tkinter and style it using Ttk and Ttkthemes
 
 ### Some insight into development
-- For my first approach to this problem, I tried to use LSH (Locality-sensitive hashing) to generate the buckets or groups of images. But figuring out how many buckets or clusters were needed was not possible. That's when I realized that it would be better to just try to cluster the images with a clustering algorithm that didn't need a number of clusters as an input. (In this case, I used Affinity Propagation)
+- For my first approach to this problem, I tried to use LSH (Locality-sensitive hashing) to generate the buckets or groups of images. But figuring out how many buckets  were needed was not possible. That's when I realized that it would be better to just group the images with a clustering algorithm that didn't need the number of clusters as an input. (In this case, I used Affinity Propagation)
 - When it was time to extract the features from the images, I created a "Color histogram" model. This method was very slow, as it iterated every pixel of the image. I didn't know exactly how to optimize it using Numpy, but I was sure it was possible. I ended up optimizing it with the help of AI.
 - I was not completely happy with having only one method of extracting features, so I also investigated how to use Keras pre-trained models to have other options. I ended up using VGG16 and MobilenetV2 to give the user the option to choose between speed and precision.
 - I investigated how to make a UI for my program and ended up using Tkinter, as the UI I needed was very simple, and other options like PyQT had a lot more unnecesary complexity for this particular case.

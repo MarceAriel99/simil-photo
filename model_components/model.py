@@ -220,8 +220,9 @@ class Model:
 
             if image_id in images_cached_features:
                 continue
-            
+
             img = image.load_img(image_path, target_size=(224, 224))
+
             img_data = image.img_to_array(img)
             images_pixel_data[image_id] = img_data
 
@@ -310,15 +311,34 @@ class Model:
             if thread.stopped():
                 if not thread.close_window:
                     self.presenter.run_completed(True)
-                return
+                return {}
             
+            # Chek if the image can be opened
             try:
-                # Check if image can be loaded
                 im = Image.open(image_path)
+            except Exception as e:
+                logging.error(f"Error opening image {image_path}: {e}")
+                del images_paths_copy[image_id]
+                continue
+                
+            # Check if image passes verification
+            try:
                 im.verify()
             except Exception as e:
-                logging.error(f"Error loading image {image_path}: {e}")
+                logging.error(f"Error opening image {image_path}: {e}")
                 del images_paths_copy[image_id]
+                continue
+
+            # Check if image can be loaded
+            try:
+                im = Image.open(image_path)
+                im.draft('RGB',(1,1)) # This is for performance reasons, we don't need to load the whole image
+                im.load()
+            except Exception as e:
+                im.close()
+                logging.error(f"Error opening image {image_path}: {e}")
+                del images_paths_copy[image_id]
+                continue
 
             self.step_progress(Steps.verify_images, image_id, len(images_paths))
 

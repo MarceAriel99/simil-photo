@@ -133,7 +133,7 @@ class SimilarityCalculator():
 
         warnings.filterwarnings("error")
         try:
-            affprop = AffinityPropagation(affinity="precomputed", damping=0.5, max_iter=350 , preference= 0.5).fit(similarity_matrix)
+            affprop = AffinityPropagation(affinity="precomputed", damping=0.6, max_iter=500 , preference= 0.5).fit(similarity_matrix)
         except UserWarning as w:
             logging.error(f"Error calculating clusters: {w}")
             return []

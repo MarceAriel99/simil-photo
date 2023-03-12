@@ -37,6 +37,8 @@ class SimilarityCalculator():
 
         self.similarity_matrix = None # Matrix with similarity values between images
 
+        self.has_converged = False # If the affinity propagation algorithm has converged
+
     def set_feature_extraction_method(self, feature_extraction_method: str, parameters: dict=None) -> None:
         self.feature_extraction_method = feature_extraction_method
         self.set_feature_extraction_parameters(parameters)
@@ -130,10 +132,12 @@ class SimilarityCalculator():
 
         if self.clustering_method != 'affinity_propagation':
             raise Exception(f"Clustering method '{self.clustering_method}' not implemented")
-
+        
+        self.has_converged = False
+        
         warnings.filterwarnings("error")
         try:
-            affprop = AffinityPropagation(affinity="precomputed", damping=0.6, max_iter=500 , preference= 0.5).fit(similarity_matrix)
+            affprop = AffinityPropagation(affinity="precomputed", damping=0.5, max_iter=500 , preference= 0.5, verbose=True).fit(similarity_matrix)
         except UserWarning as w:
             logging.error(f"Error calculating clusters: {w}")
             return []
@@ -141,6 +145,8 @@ class SimilarityCalculator():
             logging.error(f"Error calculating clusters: {e}")
             return []
         warnings.filterwarnings("default")
+
+        self.has_converged = True
 
         clusters = [[] for _ in range(max(affprop.labels_) + 1)]
 

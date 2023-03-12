@@ -170,7 +170,7 @@ class Model:
         # If no images were found, stop the execution
         if len(self.images_ids_paths) == 0:
             logging.info(f"No images found in the specified path with file types ({self.selected_file_types}), stopping execution")
-            self.presenter.run_completed()
+            self.presenter.run_completed(False, "No images found")
             return
         
         self.presenter.step_completed(Steps.search_images)
@@ -254,6 +254,11 @@ class Model:
         
         self.images_clusters = similarity_calculator.run_cluster_calculation()
         self.presenter.step_completed(Steps.calculate_clusters)
+
+        # Check if the clustering algorithm converged
+        if similarity_calculator.has_converged == False:
+            self.presenter.run_completed(False, "Clustering algorithm didn't converge")
+            return
 
         # Check if thread was stopped while calculating clusters
         if thread.stopped():

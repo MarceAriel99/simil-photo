@@ -35,7 +35,7 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 - Build a UI with Tkinter and style it using Ttk and Ttkthemes
 
 ### Some insight into development
-- For my first approach to this problem, I tried to use LSH (Locality-sensitive hashing) to generate the buckets or groups of images. But figuring out how many buckets or clusters were needed was not possible. That's when I realized that it would be better to just try to cluster the images with a clustering algorithm that didn't need a number of clusters as an input. (In this case, I used Affinity Propagation)
+- For my first approach to this problem, I tried to use LSH (Locality-sensitive hashing) to generate the buckets or groups of images. But figuring out how many buckets  were needed was not possible. That's when I realized that it would be better to just group the images with a clustering algorithm that didn't need the number of clusters as an input. (In this case, I used Affinity Propagation)
 - When it was time to extract the features from the images, I created a "Color histogram" model. This method was very slow, as it iterated every pixel of the image. I didn't know exactly how to optimize it using Numpy, but I was sure it was possible. I ended up optimizing it with the help of AI.
 - I was not completely happy with having only one method of extracting features, so I also investigated how to use Keras pre-trained models to have other options. I ended up using VGG16 and MobilenetV2 to give the user the option to choose between speed and precision.
 - I investigated how to make a UI for my program and ended up using Tkinter, as the UI I needed was very simple, and other options like PyQT had a lot more unnecesary complexity for this particular case.
@@ -72,6 +72,8 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 - If you find that you cannot open or delete images, this might be because the program does not have permissions to do so. ***Try to run the executable in administrator mode and give it another try***
 
 - If you are planning to run the program in a folder with lots of images (+2000) you should keep an eye on RAM usage 👀. Especially if your PC doesn't have much RAM capacity. (Turns out that loading +2000 images, extracting their features, and clustering them uses a lot of memory, who could have thought)
+
+- On the same note, if you're using the program in folders with large amounts of images, and at the end you get "0 groups found" this may be because the clustering algorithm didn't converge (This should be more clear, I know). ***Try to select a subfolder with fewer images to solve this***I'll implement a way of increasing the maximum number of iterations through the UI manually in the future.
 
 - Be VERY careful when using Ctrl + Z on the folder after using the program to delete a file. I'm not sure if this is a Windows bug, but doing Ctrl + Z could end up with you **LOSING ALL THE FILES ON THE FODLER**. You could maybe try to restore them by doing Ctrl + Y but success is not assured.
 

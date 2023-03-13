@@ -137,9 +137,7 @@ class SimilarityCalculator():
         if self.clustering_method != 'affinity_propagation':
             raise Exception(f"Clustering method '{self.clustering_method}' not implemented")
         
-        print("Creating affprop with parameters: ", self.clustering_parameters)
-        
-        affprop = AffinityPropagation(affinity="precomputed", damping=self.clustering_parameters["damping"], max_iter=self.clustering_parameters["max_iter"], preference=0.5, verbose=True)
+        affprop = AffinityPropagation(affinity="precomputed", damping=self.clustering_parameters["damping"], max_iter=self.clustering_parameters["max_iter"], preference=0.5)
      
         self.has_converged = False
         warnings.filterwarnings("error")

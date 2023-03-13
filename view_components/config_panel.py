@@ -146,11 +146,13 @@ class ConfigPanel(ttk.Frame):
         self.clustering_title_label = ttk.Label(self.clustering_frame, text="Clustering", font=("Arial", 15, 'bold', 'underline'))
 
         self.clustering_damping_label = ttk.Label(self.clustering_frame, text="Damping", justify=tk.CENTER)
+        tooltip.CreateToolTip(self.clustering_damping_label, TOOLTIP_CLUSTERING_DAMPING)
         self.clustering_damping_var = tk.DoubleVar()
         self.clustering_damping_var.set(0.55)
         self.clustering_damping_scale = TtkScale(self.clustering_frame, from_=0.5, to=0.99, variable=self.clustering_damping_var, orient=tk.HORIZONTAL, length=160, digits=2)
 
         self.clustering_max_iter_label = ttk.Label(self.clustering_frame, text="Max iterations", justify=tk.CENTER)
+        tooltip.CreateToolTip(self.clustering_max_iter_label, TOOLTIP_CLUSTERING_MAX_ITER)
         self.clustering_max_iter_var = tk.IntVar()
         self.clustering_max_iter_var.set(500)
         self.clustering_max_iter_scale = TtkScale(self.clustering_frame, from_=100, to=5000, variable=self.clustering_max_iter_var, orient=tk.HORIZONTAL, length=160)

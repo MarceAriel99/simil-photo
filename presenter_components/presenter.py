@@ -39,6 +39,10 @@ class Presenter:
         self.view.config_panel.select_feature_extraction_method(feature_extraction_methods.index(self.model.get_feature_extraction_method()))
         self.view.config_panel.cache_features_var.set(True) if self.model.get_save_calculated_features() else self.view.config_panel.cache_features_var.set(False)
         self.view.config_panel.force_recalculate_features_var.set(True) if self.model.get_force_recalculate_features() else self.view.config_panel.force_recalculate_features_var.set(False)
+
+        # Update clustering method parameters
+        self.view.config_panel.clustering_damping_var.set(self.model.get_clustering_parameters()["damping"])
+        self.view.config_panel.clustering_max_iter_var.set(self.model.get_clustering_parameters()["max_iter"])
     
     # This method is called just before the model starts the process and it updates the model with the data from the view
     def _apply_config_to_model(self) -> None:

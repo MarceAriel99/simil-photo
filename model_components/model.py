@@ -71,7 +71,11 @@ class Model:
         self.all_file_types = self.configFileManager.get_config_parameter(CONFIG_SECTION_FILE_TYPES, CONFIG_PARAMETER_SUPPORTED_FILE_TYPES).split(',')
 
         self.clustering_method = self.configFileManager.get_config_parameter(CONFIG_SECTION_CLUSTERING, CONFIG_PARAMETER_CLUSTERING_METHOD)
-
+        
+        clustering_parameters = self.configFileManager.get_config_parameter(CONFIG_SECTION_CLUSTERING, CONFIG_PARAMETER_CLUSTERING_PARAMETERS)
+        # Convert the string to a dictionary
+        self.clustering_parameters = dict(item.split('=') for item in clustering_parameters.split(','))
+        
         self.force_recalculate_features = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_FORCE_RECALCULATE_FEATURES) == 'True' else False
         self.save_calculated_features = True if self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_SAVE_CALCULATED_FEATURES) == 'True' else False
         self.cached_features_method = self.configFileManager.get_config_parameter(CONFIG_SECTION_CACHE, CONFIG_PARAMETER_CACHE_FEATURE_EXTRACTION_METHOD)
@@ -90,7 +94,8 @@ class Model:
 
         config_parameters[CONFIG_SECTION_FILE_TYPES] = {CONFIG_PARAMETER_SELECTED_FILE_TYPES: ','.join(self.selected_file_types)}
 
-        config_parameters[CONFIG_SECTION_CLUSTERING] = {CONFIG_PARAMETER_CLUSTERING_METHOD: self.clustering_method}
+        config_parameters[CONFIG_SECTION_CLUSTERING] = {CONFIG_PARAMETER_CLUSTERING_METHOD: self.clustering_method,
+                                                        CONFIG_PARAMETER_CLUSTERING_PARAMETERS: ','.join([f'{key}={value}' for key, value in self.clustering_parameters.items()])}
 
         config_parameters[CONFIG_SECTION_CACHE] = {CONFIG_PARAMETER_CACHE_FORCE_RECALCULATE_FEATURES: str(self.force_recalculate_features), 
         CONFIG_PARAMETER_CACHE_SAVE_CALCULATED_FEATURES: str(self.save_calculated_features), 
@@ -106,6 +111,9 @@ class Model:
 
     def _set_clustering_parameters(self, parameters:dict[str,any]={}) -> None:
         self.clustering_parameters = parameters
+
+    def get_clustering_parameters(self) -> dict[str,any]:
+        return self.clustering_parameters
 
     def set_file_types(self, file_types:list[str]) -> None:
         self.selected_file_types = file_types

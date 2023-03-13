@@ -57,6 +57,8 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 
     Here you can also choose if your images features will be cached. This will create a file that stores the features which the program will use when available to make the calculations much faster.\
     If you don't want the program to use the cached features, you can select the *Force recalculate features* checkbox.
+    
+  - On "Clustering" submenu, change the damping and max iterations sliders if the clustering algorithm doesn't converge.
 
   - On the bottom part of the configuration menu, you'll find the run/cancel button, alongside two progress bars and a text that gives you information about the status of the run
 
@@ -73,7 +75,7 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 
 - If you are planning to run the program in a folder with lots of images (+2000) you should keep an eye on RAM usage 👀. Especially if your PC doesn't have much RAM capacity. (Turns out that loading +2000 images, extracting their features, and clustering them uses a lot of memory, who could have thought)
 
-- On the same note, if you're using the program in folders with large amounts of images, and at the end you get "0 groups found" this may be because the clustering algorithm didn't converge (This should be more clear, I know). ***Try to select a subfolder with fewer images to solve this***I'll implement a way of increasing the maximum number of iterations through the UI manually in the future.
+- On the same note, if you're using the program in folders with large amounts of images, the clustering algorithm may not converge. You can change the parameters on the "Clustering" submenu to try to fix that. If the algorithm still doesn't converge try selecting a subfolder with less images.
 
 - Be VERY careful when using Ctrl + Z on the folder after using the program to delete a file. I'm not sure if this is a Windows bug, but doing Ctrl + Z could end up with you **LOSING ALL THE FILES ON THE FODLER**. You could maybe try to restore them by doing Ctrl + Y but success is not assured.
 

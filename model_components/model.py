@@ -35,6 +35,7 @@ class Model:
         self.selected_file_types:list[str] = CONFIG_DEFAULT_VALUE_SELECTED_FILE_TYPES
         self.clustering_method:str = CONFIG_DEFAULT_VALUE_CLUSTERING_METHOD
         self.feature_extraction_parameters:dict[str,any] = {}
+        self.clustering_parameters:dict[str,any] = {}
         self.similarity_calculator:SimilarityCalculator = None
 
         self.images_ids_paths:dict[int,str] = {} #{id: absolute_path}
@@ -103,6 +104,9 @@ class Model:
     def _set_feature_extraction_parameters(self, parameters:dict[str,any]={}) -> None:
         self.feature_extraction_parameters = parameters
 
+    def _set_clustering_parameters(self, parameters:dict[str,any]={}) -> None:
+        self.clustering_parameters = parameters
+
     def set_file_types(self, file_types:list[str]) -> None:
         self.selected_file_types = file_types
 
@@ -122,8 +126,9 @@ class Model:
     def get_all_feature_extraction_methods(self) -> list[str]:
         return self.all_feature_extraction_methods
     
-    def set_clustering_method(self, clustering_method:str) -> None:
+    def set_clustering_method(self, clustering_method:str, parameters:dict[str,any]={}) -> None:
         self.clustering_method = clustering_method
+        self._set_clustering_parameters(parameters)
     
     def set_images_path(self, images_path:str) -> None:
         self.images_path = images_path
@@ -237,6 +242,8 @@ class Model:
         similarity_calculator = SimilarityCalculator(images_pixel_data, images_cached_features, feature_extraction_method=self.selected_feature_extraction_method)
         # Set feature extraction parameters
         similarity_calculator.set_feature_extraction_parameters(self.feature_extraction_parameters)
+        # Set clustering parameters
+        similarity_calculator.set_clustering_parameters(self.clustering_parameters)
         
         # Run similarity calculator
         self.presenter.step_started(Steps.calculate_features)

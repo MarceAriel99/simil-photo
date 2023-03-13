@@ -145,29 +145,29 @@ class ConfigPanel(ttk.Frame):
 
         self.clustering_title_label = ttk.Label(self.clustering_frame, text="Clustering", font=("Arial", 15, 'bold', 'underline'))
 
-        self.clustering_dampenig_label = ttk.Label(self.clustering_frame, text="Dampening", justify=tk.CENTER)
-        self.clustering_dampening_var = tk.DoubleVar()
-        self.clustering_dampening_var.set(0.55)
-        self.clustering_dampening_scale = TtkScale(self.clustering_frame, from_=0.5, to=0.99, variable=self.clustering_dampening_var, orient=tk.HORIZONTAL, length=160, digits=2)
+        self.clustering_damping_label = ttk.Label(self.clustering_frame, text="Damping", justify=tk.CENTER)
+        self.clustering_damping_var = tk.DoubleVar()
+        self.clustering_damping_var.set(0.55)
+        self.clustering_damping_scale = TtkScale(self.clustering_frame, from_=0.5, to=0.99, variable=self.clustering_damping_var, orient=tk.HORIZONTAL, length=160, digits=2)
 
-        self.clustering_iterations_label = ttk.Label(self.clustering_frame, text="Max iterations", justify=tk.CENTER)
-        self.clustering_iterations_var = tk.IntVar()
-        self.clustering_iterations_var.set(500)
-        self.clustering_iterations_scale = TtkScale(self.clustering_frame, from_=100, to=5000, variable=self.clustering_iterations_var, orient=tk.HORIZONTAL, length=160)
+        self.clustering_max_iter_label = ttk.Label(self.clustering_frame, text="Max iterations", justify=tk.CENTER)
+        self.clustering_max_iter_var = tk.IntVar()
+        self.clustering_max_iter_var.set(500)
+        self.clustering_max_iter_scale = TtkScale(self.clustering_frame, from_=100, to=5000, variable=self.clustering_max_iter_var, orient=tk.HORIZONTAL, length=160)
 
         self.clustering_title_label.grid(row=0, column=0, columnspan=2, sticky=tk.W)
-        self.clustering_dampenig_label.grid(row=1, column=0, padx=(0,5), sticky=tk.S)
-        self.clustering_dampening_scale.grid(row=1, column=1, sticky=tk.W, padx=(0,20))
-        self.clustering_iterations_label.grid(row=1, column=2, padx=(0,5), sticky=tk.S)
-        self.clustering_iterations_scale.grid(row=1, column=3, sticky=tk.W)
+        self.clustering_damping_label.grid(row=1, column=0, padx=(0,5), sticky=tk.S)
+        self.clustering_damping_scale.grid(row=1, column=1, sticky=tk.W, padx=(0,20))
+        self.clustering_max_iter_label.grid(row=1, column=2, padx=(0,5), sticky=tk.S)
+        self.clustering_max_iter_scale.grid(row=1, column=3, sticky=tk.W)
 
     def _create_run_submenu(self, presenter:Presenter) -> None:
         
         self.run_status_label = ttk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 11))
-        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,5), columnspan=3)
+        self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,2), columnspan=3)
 
         self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1, )
-        self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(10,5))
+        self.progress_bar.grid(row=1, column=0, columnspan=3, sticky=tk.W, pady=(5,5))
 
         self.progress_bar_ind = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='indeterminate', length=500)
         self.progress_bar_ind.grid(row=2, column=0, columnspan=3, sticky=tk.W, pady=(5,5))
@@ -271,6 +271,12 @@ class ConfigPanel(ttk.Frame):
 
     def get_force_recalculate_features_checkbox_state(self) -> bool:
         return self.force_recalculate_features_var.get()
+    
+    def get_damping_value(self) -> float:
+        return self.clustering_damping_var.get()
+    
+    def get_max_iter_value(self) -> int:
+        return self.clustering_max_iter_var.get()
     
     def load_feature_extraction_methods_descriptions(self) -> None:
         try:

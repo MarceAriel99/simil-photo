@@ -46,8 +46,12 @@ class SimilarityCalculator():
     def set_feature_extraction_parameters(self, parameters: dict[str, any]) -> None:
         self.feature_extraction_parameters = parameters
 
-    def set_clustering_method(self, clustering_method: str) -> None:
+    def set_clustering_method(self, clustering_method: str, parameters: dict={}) -> None:
         self.clustering_method = clustering_method
+        self.set_clustering_parameters(parameters)
+
+    def set_clustering_parameters(self, parameters: dict[str, any]) -> None:
+        self.clustering_parameters = parameters if parameters is not {} else {"damping": 0.5, "max_iter":500}
 
     def get_normalized_features(self) -> dict[int, np.ndarray]:
         return self.image_features
@@ -133,11 +137,14 @@ class SimilarityCalculator():
         if self.clustering_method != 'affinity_propagation':
             raise Exception(f"Clustering method '{self.clustering_method}' not implemented")
         
-        self.has_converged = False
+        print("Creating affprop with parameters: ", self.clustering_parameters)
         
+        affprop = AffinityPropagation(affinity="precomputed", damping=self.clustering_parameters["damping"], max_iter=self.clustering_parameters["max_iter"], preference=0.5, verbose=True)
+     
+        self.has_converged = False
         warnings.filterwarnings("error")
         try:
-            affprop = AffinityPropagation(affinity="precomputed", damping=0.5, max_iter=500 , preference= 0.5, verbose=True).fit(similarity_matrix)
+            affprop.fit(similarity_matrix)
         except UserWarning as w:
             logging.error(f"Error calculating clusters: {w}")
             return []

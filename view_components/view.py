@@ -99,6 +99,12 @@ class View(ThemedTk):
 
     def get_force_recalculate_features_checkbox_state(self) -> bool:
         return self.config_panel.get_force_recalculate_features_checkbox_state()
+    
+    def get_damping_value(self) -> float:
+        return self.config_panel.get_damping_value()
+    
+    def get_max_iter_value(self) -> int:
+        return self.config_panel.get_max_iter_value()
 
     def add_message_to_queue(self, message:str) -> None:
         self.config_panel.queue.put(message)

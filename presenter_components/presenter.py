@@ -7,6 +7,7 @@ from steps import Steps
 import timeit
 
 import logging
+from constants import *
 
 '''
 This class is the presenter of the application, it is responsible for the communication between the model and the view.
@@ -45,6 +46,8 @@ class Presenter:
         self.model.set_check_subdirectories(self.view.get_subdirectories_checkbox_state())
         self.model.set_file_types(["." + file_type_name for file_type_name, value in self.view.get_file_types_variables().items() if value.get()])
         self.model.set_feature_extraction_method(self.view.get_selected_feature_extraction_method())
+        clustering_parameters = {"damping": self.view.get_damping_value(), "max_iter": self.view.get_max_iter_value()}
+        self.model.set_clustering_method(CONFIG_DEFAULT_VALUE_CLUSTERING_METHOD, clustering_parameters)
         self.model.set_save_calculated_features(self.view.get_cache_features_checkbox_state())
         self.model.set_force_recalculate_features(self.view.get_force_recalculate_features_checkbox_state())
         

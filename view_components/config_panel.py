@@ -15,6 +15,7 @@ from constants import *
 from view_components.custom_entry import CustomEntry
 
 import view_components.tooltip as tooltip
+from view_components.scale import TtkScale
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -36,18 +37,22 @@ class ConfigPanel(ttk.Frame):
         self.config_title_label = ttk.Label(self, text="Configuration", font=("Arial", 20))
         self.config_title_label.grid(row=0, column=0, sticky="nw", pady=(0, 10))
         self.file_search_frame = ttk.Frame(self)
-        self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=10)
-        ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=10)
+        self.file_search_frame.grid(row=1, column=0, sticky="nsew", pady=5)
+        ttk.Separator(self, orient='horizontal').grid(row=2, column=0, sticky="nsew", pady=5)
         self.feature_extraction_frame = ttk.Frame(self)
-        self.feature_extraction_frame.grid(row=3, column=0, sticky="nsew", pady=10)
-        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=10)
+        self.feature_extraction_frame.grid(row=3, column=0, sticky="nsew", pady=5)
+        ttk.Separator(self, orient='horizontal').grid(row=4, column=0, sticky="nsew", pady=5)
+        self.clustering_frame = ttk.Frame(self)
+        self.clustering_frame.grid(row=5, column=0, sticky="nsew", pady=5)
+        ttk.Separator(self, orient='horizontal').grid(row=6, column=0, sticky="nsew", pady=5)
         self.run_frame = ttk.Frame(self)
-        self.run_frame.grid(row=5, column=0, sticky="nsew", pady=10)
+        self.run_frame.grid(row=7, column=0, sticky="nsew", pady=5)
 
         self.load_feature_extraction_methods_descriptions()
 
         self._create_file_search_submenu(presenter)
         self._create_feature_extraction_submenu(presenter)
+        self._create_clustering_submenu(presenter)
         self._create_run_submenu(presenter)
 
     def _create_file_search_submenu(self, presenter:Presenter) -> None:
@@ -136,9 +141,29 @@ class ConfigPanel(ttk.Frame):
 
         # POSSIBLE UPGRADE: Make a second listbox for choosing the parameters of the selected feature extraction method
 
+    def _create_clustering_submenu(self, presenter:Presenter) -> None:
+
+        self.clustering_title_label = ttk.Label(self.clustering_frame, text="Clustering", font=("Arial", 15, 'bold', 'underline'))
+
+        self.clustering_dampenig_label = ttk.Label(self.clustering_frame, text="Dampening", justify=tk.CENTER)
+        self.clustering_dampening_var = tk.DoubleVar()
+        self.clustering_dampening_var.set(0.55)
+        self.clustering_dampening_scale = TtkScale(self.clustering_frame, from_=0.5, to=0.99, variable=self.clustering_dampening_var, orient=tk.HORIZONTAL, length=160, digits=2)
+
+        self.clustering_iterations_label = ttk.Label(self.clustering_frame, text="Max iterations", justify=tk.CENTER)
+        self.clustering_iterations_var = tk.IntVar()
+        self.clustering_iterations_var.set(500)
+        self.clustering_iterations_scale = TtkScale(self.clustering_frame, from_=100, to=5000, variable=self.clustering_iterations_var, orient=tk.HORIZONTAL, length=160)
+
+        self.clustering_title_label.grid(row=0, column=0, columnspan=2, sticky=tk.W)
+        self.clustering_dampenig_label.grid(row=1, column=0, padx=(0,5), sticky=tk.S)
+        self.clustering_dampening_scale.grid(row=1, column=1, sticky=tk.W, padx=(0,20))
+        self.clustering_iterations_label.grid(row=1, column=2, padx=(0,5), sticky=tk.S)
+        self.clustering_iterations_scale.grid(row=1, column=3, sticky=tk.W)
+
     def _create_run_submenu(self, presenter:Presenter) -> None:
         
-        self.run_status_label = ttk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 12))
+        self.run_status_label = ttk.Label(self.run_frame, text="Status: Waiting to start...", font=("Arial", 11))
         self.run_status_label.grid(row=0, column=0, sticky=tk.W, pady=(0,5), columnspan=3)
 
         self.progress_bar = ttk.Progressbar(self.run_frame, orient=tk.HORIZONTAL, mode='determinate', length=500, maximum=100.1, )

@@ -80,11 +80,11 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 - Be VERY careful when using Ctrl + Z on the folder after using the program to delete a file. I'm not sure if this is a Windows bug, but doing Ctrl + Z could end up with you **LOSING ALL THE FILES ON THE FODLER**. You could maybe try to restore them by doing Ctrl + Y but success is not assured.
 
 ## Upgrade ideas
-- Show all error messages to the user in a popup so they can know when something goes wrong (And what went wrong)
-- Make the tkinter implementation more scalable to other screen resolutions (It is currently optimized for 1920x1080)
-- Have the possibility of changing the parameters of the Feature Extracting methods
-- Give the option to search in a group of folders
-- Give the option to select and delete groups of images instead of doing it individually
+- Exceptions system that is more transparent to the user.
+- Tkinter UI more scalable to other screen resolutions (It is currently optimized for 1920x1080)
+- Option to change the parameters of the Feature Extracting methods
+- Ooption to search in a group of folders
+- Option to select and delete groups of images instead of doing it individually
 
 ## Disclaimer
 I advise you to be careful when using the program. After all, it can delete files from your PC that may not be recoverable.\

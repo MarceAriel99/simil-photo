@@ -18,7 +18,7 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 <img src="https://user-images.githubusercontent.com/60658991/222874879-b8276638-36a9-485a-a59e-e85f21edd21e.png" width="400" align="center"/>
 </br>
 </br>
-**Using VGG16, the program has separated these images into 5 groups as expected.**\
+**Using VGG16, the program has classified these images into 5 groups as expected.**\
 <img src="https://user-images.githubusercontent.com/60658991/222874953-4c93ff46-9a71-4cfb-870a-472c1f8725bc.png" width="400" align="center"/>
 <img src="https://user-images.githubusercontent.com/60658991/222874977-8d39f771-4db7-49c1-9432-fe765b5a6fe4.png" width="400" align="center"/>
 <img src="https://user-images.githubusercontent.com/60658991/222874982-611bf538-a40b-458e-9ce9-371ea06709d7.png" width="400" align="center"/>
@@ -77,13 +77,13 @@ This is a pure Python 🐍 application and it's ready to run on Windows without 
 
 - On the same note, if you're using the program in folders with large amounts of images, the clustering algorithm may not converge. You can change the parameters on the "Clustering" submenu to try to fix that. If the algorithm still doesn't converge try selecting a subfolder with less images.
 
-- Be VERY careful when using Ctrl + Z on the folder after using the program to delete a file. I'm not sure if this is a Windows bug, but doing Ctrl + Z could end up with you **LOSING ALL THE FILES ON THE FODLER**. You could maybe try to restore them by doing Ctrl + Y but success is not assured.
+- Be VERY careful when using Ctrl + Z on the folder after using the program to delete a file. I'm not sure if this is a Windows bug, but doing Ctrl + Z could end up with you **LOSING ALL THE FILES ON THE FOLDER**. You could maybe try to restore them by doing Ctrl + Y but success is not assured.
 
 ## Upgrade ideas
 - Exceptions system that is more transparent to the user.
 - Tkinter UI more scalable to other screen resolutions (It is currently optimized for 1920x1080)
 - Option to change the parameters of the Feature Extracting methods
-- Ooption to search in a group of folders
+- Option to search in a group of folders
 - Option to select and delete groups of images instead of doing it individually
 
 ## Disclaimer
